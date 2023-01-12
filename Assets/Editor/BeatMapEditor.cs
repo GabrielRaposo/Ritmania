@@ -11,6 +11,9 @@ public class BeatMapEditor : Editor
 
     private AudioSource audio;
 
+    private Texture2D waveFormTexture;
+    private int waveFormWidth;
+
     public override bool RequiresConstantRepaint() => true;
 
     public override void OnInspectorGUI()
@@ -49,10 +52,13 @@ public class BeatMapEditor : Editor
 
         GUILayout.EndHorizontal(); //A0
 
+        GUILayout.BeginVertical(GUILayout.Height(50));
+        GUILayout.Label(".");
+        GUILayout.EndVertical();
+        
         var r = GUILayoutUtility.GetLastRect();
+        DrawTimeLine(r);
         
-        
-        GUILayout.Label(GetTimeLineDrawing(Mathf.RoundToInt(r.width)));
         
         var timelineRect = GUILayoutUtility.GetLastRect();
         
@@ -61,6 +67,7 @@ public class BeatMapEditor : Editor
         var mousePos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
         var canvasPos = GUIUtility.GUIToScreenRect(timelineRect).position;
 
+        //Controles
         bool mouseInsideTimeline = true;
 
         var relativeMousePos = mousePos-canvasPos;
@@ -81,55 +88,64 @@ public class BeatMapEditor : Editor
         }
     }
 
-    public Texture2D GetTimeLineDrawing(int lenght)
+    public void DrawTimeLine(Rect lastRect)
     {
-        int x = lenght;
+        int x = Mathf.CeilToInt(lastRect.width);
         int y = 50;
 
-        Color bg = new Color(0.7f, 0.7f, 0.7f);
+        var r = lastRect;
+        
+        Color bg = new Color(0.55f, 0.55f, 0.55f);
         Color lineColor = Color.red;
 
-        float lineSize = 1;
+        int lineSize = 1;
 
-        float marker = (audio.time / audio.clip.length)*lenght;
-        float t1;
-        float t2;
+        float marker = (audio.time / audio.clip.length)*x;
         
-        var tex = new Texture2D(lenght, y, TextureFormat.RGBA32, false);
-        
-        var wave =AudioTrackPlotter.GetWaveform(Mathf.RoundToInt(lenght), 50, audio.clip, Color.clear, Color.yellow);
+        var bgTex = new Texture2D(x, y, TextureFormat.RGBA32, false);
 
         for (int i = 0; i < x; i++)
         {
-            t1 = marker - lineSize;
-            t2 = marker + lineSize;
-            //Debug.Log($"t1:{t1} / {marker} / t2:{t2}");
-            
             for (int j = 0; j < y; j++)
             {
-                Color c; 
-                
-                if(i > t1 && i < t2)
-                    c = lineColor;
-                else
-                    c = bg;
-
-                c += ( wave.GetPixel(i, j) * 0.2f);
-                
-                tex.SetPixel(i,j,c);
-                
-                
+                bgTex.SetPixel(i,j,bg);
             }
         }
         
-        tex.Apply();
+        bgTex.Apply();
+        var wave = GetSoundWaveTexture(x);
         
+        GUI.DrawTexture(r, bgTex, ScaleMode.ScaleAndCrop, true);
+        GUI.DrawTexture(r, wave, ScaleMode.ScaleAndCrop, true);
+
+        int markerHight = y;
+        var markerTex = new Texture2D(lineSize, markerHight, TextureFormat.RGBA32, false);
         
-
-
-        return tex;
-
+        for (int i = 0; i < lineSize; i++)
+        {
+            for (int j = 0; j < markerHight; j++)
+            {
+                markerTex.SetPixel(i,j,lineColor);
+            }
+        }
+        
+        markerTex.Apply();
+        
+        GUI.DrawTexture(new Rect(Mathf.RoundToInt(marker)+18, r.y, lineSize, markerHight), markerTex, ScaleMode.StretchToFill, true);
+        
     }
+
+    private Texture2D GetSoundWaveTexture(int lenght)
+    {
+        if (waveFormTexture != null && waveFormWidth == lenght)
+            return waveFormTexture;
+        
+        waveFormTexture = AudioTrackPlotter.GetWaveform(Mathf.RoundToInt(lenght), 50, audio.clip, Color.clear, Color.yellow - new Color(0f,0f,0f,0.1f));
+        waveFormWidth = lenght;
+
+        return waveFormTexture;
+
+    } 
     
 
 }
