@@ -12,6 +12,8 @@ namespace RhythmSystem {
         public float songBpm;
 
         [Header("Runtime Values")]
+        public bool isPlaying;
+
         //The offset to the first beat of the song in seconds
         public float firstBeatOffset;
 
@@ -44,6 +46,9 @@ namespace RhythmSystem {
 
             //Start the music
             musicSource.Play();
+
+            //Sync variable used on BeatTrack
+            isPlaying = true;
         }
 
         void Update()
