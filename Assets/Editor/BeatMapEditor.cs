@@ -39,6 +39,10 @@ public class BeatMapEditor : Editor
 
         EditorGUILayout.LabelField("AudioSource");
         soundInEditor._AudioSource = (AudioSource)EditorGUILayout.ObjectField(soundInEditor._AudioSource, typeof(AudioSource), true);
+
+        BeatCallsEditor(obj);
+        
+        GUILayout.Space(5);
         
         GUILayout.BeginHorizontal();//A
         
@@ -52,22 +56,36 @@ public class BeatMapEditor : Editor
 
         GUILayout.EndHorizontal(); //A0
 
-        GUILayout.BeginVertical(GUILayout.Height(50));
+        //Time line
+        GUILayout.BeginVertical(GUILayout.Height(65));
         GUILayout.Label(".");
         GUILayout.EndVertical();
         
         var r = GUILayoutUtility.GetLastRect();
-        DrawTimeLine(r);
-        
+        DrawTimeLine(r, obj);
         
         var timelineRect = GUILayoutUtility.GetLastRect();
         
         GUILayout.Label($"{audio.time/audio.clip.length}");
+        
+        //Calls Buttons
+        GUILayout.BeginHorizontal(); //B
+        for (int i = 0; i < obj.callTypes.Count; i++)
+        {
+            int index = i;
 
+            if (GUILayout.Button($"{index}", GUILayout.MaxWidth(17)))
+            {
+                obj.calls.Add(new Tuple<float, BeatCall>(audio.time, obj.callTypes[index]));
+            }
+        }
+        GUILayout.EndHorizontal(); //B0
+
+        //Controles
+        
         var mousePos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
         var canvasPos = GUIUtility.GUIToScreenRect(timelineRect).position;
 
-        //Controles
         bool mouseInsideTimeline = true;
 
         var relativeMousePos = mousePos-canvasPos;
@@ -88,40 +106,71 @@ public class BeatMapEditor : Editor
         }
     }
 
-    public void DrawTimeLine(Rect lastRect)
+    private void BeatCallsEditor(BeatMap obj)
     {
-        int x = Mathf.CeilToInt(lastRect.width);
-        int y = 50;
+        if (obj.callTypes == null)
+            obj.callTypes = new List<BeatCall>();
+
+        if (obj.calls == null)
+            obj.calls = new List<Tuple<float, BeatCall>>();
+
+        for (int i = 0; i < obj.callTypes.Count; i++)
+        {
+            var call = obj.callTypes[i];
+            GUILayout.Label($"{i}:");
+
+            call.awnserCount = EditorGUILayout.IntField("Awnser Count", call.awnserCount);
+            call.awnserDistance = EditorGUILayout.FloatField("Distance", call.awnserDistance);
+            call.awnsersSpacing = EditorGUILayout.IntField("Spacing", call.awnsersSpacing);
+        }
+        
+        if(GUILayout.Button("Add +"))
+            obj.callTypes.Add(new BeatCall());
+        
+    }
+
+    public void DrawTimeLine(Rect lastRect, BeatMap beatMap)
+    {
+        int width = Mathf.CeilToInt(lastRect.width);
+        int height = Mathf.CeilToInt(lastRect.height);
+
+        int halfHeight = Mathf.CeilToInt(height / 2f);
 
         var r = lastRect;
         
-        Color bg = new Color(0.55f, 0.55f, 0.55f);
+        Color bgColor = new Color(0.55f, 0.55f, 0.55f);
+        Color dividerColor = new Color(0f,0f,0f, 0.4f);
         Color lineColor = Color.red;
 
-        int lineSize = 1;
+        int markerLineSize = 1;
+        int dividerLineSize = 2;
 
-        float marker = (audio.time / audio.clip.length)*x;
+        float markerPos = (audio.time / audio.clip.length)*width;
         
-        var bgTex = new Texture2D(x, y, TextureFormat.RGBA32, false);
+        var bgTex = TextureDrawingUtil.GetFill(width, height, bgColor);
+        
+        var wave = GetSoundWaveTexture(width);
 
-        for (int i = 0; i < x; i++)
-        {
-            for (int j = 0; j < y; j++)
-            {
-                bgTex.SetPixel(i,j,bg);
-            }
-        }
-        
-        bgTex.Apply();
-        var wave = GetSoundWaveTexture(x);
+        var dividerTex = TextureDrawingUtil.GetFill(width, dividerLineSize, dividerColor);
         
         GUI.DrawTexture(r, bgTex, ScaleMode.ScaleAndCrop, true);
         GUI.DrawTexture(r, wave, ScaleMode.ScaleAndCrop, true);
+        GUI.DrawTexture(new Rect(r.x, Mathf.RoundToInt(r.y+(r.height/2f)-dividerLineSize/2f), width, dividerLineSize), dividerTex, ScaleMode.ScaleAndCrop, true);
 
-        int markerHight = y;
-        var markerTex = new Texture2D(lineSize, markerHight, TextureFormat.RGBA32, false);
+        var arrow = TextureDrawingUtil.GetArrow(7, halfHeight, 0.3f, Color.cyan);
+        var block = TextureDrawingUtil.GetFill(7, halfHeight, Color.magenta);
+
+        foreach (Tuple<float,BeatCall> beatMapCall in beatMap.calls)
+        {
+            int x = Mathf.RoundToInt((beatMapCall.Item1 / audio.clip.length)*width) - 3;
+            var a = new Rect(r.x+x, r.y, 7, halfHeight);
+            GUI.DrawTexture(a, arrow);
+        }
         
-        for (int i = 0; i < lineSize; i++)
+        int markerHight = height;
+        var markerTex = new Texture2D(markerLineSize, markerHight, TextureFormat.RGBA32, false);
+        
+        for (int i = 0; i < markerLineSize; i++)
         {
             for (int j = 0; j < markerHight; j++)
             {
@@ -131,7 +180,7 @@ public class BeatMapEditor : Editor
         
         markerTex.Apply();
         
-        GUI.DrawTexture(new Rect(Mathf.RoundToInt(marker)+18, r.y, lineSize, markerHight), markerTex, ScaleMode.StretchToFill, true);
+        GUI.DrawTexture(new Rect(Mathf.RoundToInt(markerPos)+18, r.y, markerLineSize, markerHight), markerTex, ScaleMode.StretchToFill, true);
         
     }
 
