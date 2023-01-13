@@ -11,6 +11,10 @@ namespace RhythmSystem {
         //This is determined by the song you're trying to sync up to
         public float songBpm;
 
+        [Header("Runtime Values")]
+        //The offset to the first beat of the song in seconds
+        public float firstBeatOffset;
+
         //The number of seconds for each song beat
         public float secPerBeat;
 
@@ -36,10 +40,19 @@ namespace RhythmSystem {
             secPerBeat = 60f / songBpm;
 
             //Record the time when the music starts
-            dspSongTime = (float)AudioSettings.dspTime;
+            dspSongTime = (float) AudioSettings.dspTime;
 
             //Start the music
             musicSource.Play();
+        }
+
+        void Update()
+        {
+            //determine how many seconds since the song started
+            songPosition = (float)(AudioSettings.dspTime - dspSongTime - firstBeatOffset);
+
+            //determine how many beats since the song started
+            songPositionInBeats = songPosition / secPerBeat;
         }
     }
 }
