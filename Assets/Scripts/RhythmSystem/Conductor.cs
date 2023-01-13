@@ -38,6 +38,11 @@ namespace RhythmSystem {
             //Load the AudioSource attached to the Conductor GameObject
             musicSource = GetComponent<AudioSource>();
 
+            //Setup();
+        }
+
+        private void Setup()
+        {
             //Calculate the number of seconds in each beat
             secPerBeat = 60f / songBpm;
 
@@ -53,6 +58,13 @@ namespace RhythmSystem {
 
         void Update()
         {
+            if (!isPlaying) 
+            {
+                if (Input.GetKeyDown(KeyCode.Space))
+                    Setup();
+                return;
+            }
+
             //determine how many seconds since the song started
             songPosition = (float)(AudioSettings.dspTime - dspSongTime - firstBeatOffset);
 
