@@ -61,7 +61,7 @@ namespace RhythmSystem {
             //Wait for player input to start playing
             if (!isPlaying) 
             {
-                if (Input.GetKeyDown(KeyCode.Space))
+                if (Input.GetKeyDown(KeyCode.Return))
                     Setup();
                 return;
             }

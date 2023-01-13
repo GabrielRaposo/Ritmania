@@ -32,6 +32,9 @@ namespace RhythmSystem
         // Update is called once per frame
         void Update()
         {
+            if (!conductor.isPlaying)
+                return;
+
             //Start playing the current animation from wherever the current conductor loop is
             animator.Play(currentState, -1, (conductor.songPositionInBeats));
             //Set the speed to 0 so it will only change frames when you next update it
