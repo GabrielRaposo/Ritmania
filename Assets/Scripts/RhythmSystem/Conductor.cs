@@ -58,6 +58,7 @@ namespace RhythmSystem {
 
         void Update()
         {
+            //Wait for player input to start playing
             if (!isPlaying) 
             {
                 if (Input.GetKeyDown(KeyCode.Space))
