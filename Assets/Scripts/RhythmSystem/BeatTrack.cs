@@ -55,9 +55,6 @@ namespace RhythmSystem
             float timeShownInAdvance = beatsShownInAdvance * conductor.secPerBeat;
             if (currentBeatTime < conductor.songPosition + timeShownInAdvance)
             {
-                Debug.Log("currentBeatTime: " + currentBeatTime);
-                Debug.Log("timeShownInAdvance: " + timeShownInAdvance);
-
                 GameObject note = notesPool.GetFromPool();
                 note.transform.position = Vector2.right * nextIndex;
                 note.SetActive(true);
