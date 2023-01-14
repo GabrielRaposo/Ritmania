@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace RhythmSystem {
     // -- Classe criada usando como base o link a seguir:
@@ -10,6 +11,8 @@ namespace RhythmSystem {
         //Song beats per minute
         //This is determined by the song you're trying to sync up to
         public float songBpm;
+
+        public float introSilence;
 
         [Header("Runtime Values")]
         public bool isPlaying;
@@ -38,14 +41,12 @@ namespace RhythmSystem {
             //Load the AudioSource attached to the Conductor GameObject
             musicSource = GetComponent<AudioSource>();
 
-            //Setup();
+            //Calculate the number of seconds in each beat
+            secPerBeat = 60f / songBpm;
         }
 
         private void Setup()
         {
-            //Calculate the number of seconds in each beat
-            secPerBeat = 60f / songBpm;
-
             //Record the time when the music starts
             dspSongTime = (float) AudioSettings.dspTime;
 
@@ -71,6 +72,12 @@ namespace RhythmSystem {
 
             //determine how many beats since the song started
             songPositionInBeats = songPosition / secPerBeat;
+        }
+
+        public static IEnumerator WaitForConductor(Conductor conductor, UnityAction action)
+        {
+            yield return new WaitWhile( () => conductor.isPlaying! );
+            action();
         }
     }
 }

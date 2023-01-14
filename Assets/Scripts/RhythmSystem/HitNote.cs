@@ -6,16 +6,16 @@ namespace RhythmSystem
 {
     public class HitNote : MonoBehaviour
     {
-        double targetBeat;
-        float beatsShownInAdvance;
+        float targetBeat;
+        float timeShownInAdvance;
         Conductor conductor;
         Transform spawnAnchor;
         Transform targetAnchor;
 
-        public void Setup (double targetBeat, float beatsShownInAdvance, Conductor conductor, Transform spawnAnchor, Transform targetAnchor)
+        public void Setup (float targetBeat, float timeShownInAdvance, Conductor conductor, Transform spawnAnchor, Transform targetAnchor)
         {
             this.targetBeat = targetBeat;
-            this.beatsShownInAdvance = beatsShownInAdvance;
+            this.timeShownInAdvance = timeShownInAdvance;
 
             this.conductor = conductor;
             this.spawnAnchor = spawnAnchor;
@@ -26,15 +26,15 @@ namespace RhythmSystem
 
         void Update()
         {
-            double t = (targetBeat - conductor.songPositionInBeats);
+            float t = (targetBeat - conductor.songPosition);
             transform.position = Vector2.Lerp(
                 spawnAnchor.position,
                 targetAnchor.position,
-                (beatsShownInAdvance - (float)t) / beatsShownInAdvance
+                (timeShownInAdvance - t) / timeShownInAdvance
             );    
 
             // Se estiver com AutoPlay, acerta a nota no primeiro frame válido
-            if (GameManager.AutoPlay && conductor.songPositionInBeats >= targetBeat)
+            if (GameManager.AutoPlay && conductor.songPosition >= targetBeat)
                 OnHit();   
         }
 

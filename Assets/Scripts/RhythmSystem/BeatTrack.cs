@@ -18,29 +18,53 @@ namespace RhythmSystem
         int nextIndex;
 
         //beatmap
-        List<double> beatmap;
+        List<float> beatmapInBeats; // Lista com formato acessível
+        List<float> beatmap; // Beatmap de fato, com precisão de tempo em segundos
 
         private void Start() 
         {
-            beatmap = new List<double>() { 1,1.5d,2,3,5,6,7,9,10,11 };
+            // -- Define beatmap em Beats
+            beatmapInBeats = new List<float>() { 1, 1.5f, 2, 3, 5, 6, 7, 9, 10, 11 };
+            
+            StartCoroutine( Conductor.WaitForConductor(conductor, TranslateToBeatmap) );
         }
+
+        private void TranslateToBeatmap()
+        {
+            // -- Transforma beatmap em divisões de segundos
+            beatmap = new List<float>();
+            for (int i = 0; i < beatmapInBeats.Count; i++) 
+            {
+                beatmap.Add(beatmapInBeats[i] * conductor.secPerBeat);
+            }
+        }
+
 
         void Update()
         {
-            if(!conductor.isPlaying)
+            if (!conductor.isPlaying)
                 return;
 
-            //float targetBeat = (nextIndex + 1) * 2; // Valor temporário
-
-            if (nextIndex < beatmap.Count && beatmap[nextIndex] < conductor.songPositionInBeats + beatsShownInAdvance)
+            if (nextIndex > beatmap.Count - 1)
             {
+                // TO-DO: flag de termino de beatmap
+                return;
+            }
+
+            float currentBeatTime = beatmap[nextIndex];
+            float timeShownInAdvance = beatsShownInAdvance * conductor.secPerBeat;
+            if (currentBeatTime < conductor.songPosition + timeShownInAdvance)
+            {
+                Debug.Log("currentBeatTime: " + currentBeatTime);
+                Debug.Log("timeShownInAdvance: " + timeShownInAdvance);
+
                 GameObject note = notesPool.GetFromPool();
                 note.transform.position = Vector2.right * nextIndex;
                 note.SetActive(true);
 
                 HitNote hitNote = note.GetComponent<HitNote>();
                 if (hitNote) 
-                    hitNote.Setup(beatmap[nextIndex], beatsShownInAdvance, conductor, spawnAnchor, targetAnchor);
+                    hitNote.Setup(currentBeatTime, timeShownInAdvance, conductor, spawnAnchor, targetAnchor);
 
                 nextIndex++;
             }
