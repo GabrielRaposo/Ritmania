@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace RhythmSystem {
+namespace RhythmSystem 
+{
     // -- Classe criada usando como base o link a seguir:
     // -- https://www.gamedeveloper.com/audio/coding-to-the-beat---under-the-hood-of-a-rhythm-game-in-unity
     public class Conductor : MonoBehaviour
     {
-        [Header("-- Song Values")]
+        #region Variables
+
+        // TO-DO: por enquanto recebe só um valor fixo, depois deve fazer um cálculo de acordo com o beatsShownInAdvance
+        public float introSilenceBaseFiller; 
+
+        [Header("-- Runtime Values")]
         // Batidas por minuto
         // Isto é um atributo originado pela música da qual você está tentando se sincronizar
         public float songBpm;
@@ -16,10 +22,9 @@ namespace RhythmSystem {
         // O atraso da primeira batida da música em segundos 
         public float firstBeatOffset;
 
-            // TO-DO: por enquanto recebe só um valor fixo, depois deve fazer um cálculo de acordo com o beatsShownInAdvance
-            public float introSilenceBaseFiller; 
+        // TO-DO: comentar ----------------------
+        public float beatsShownInAdvance;
 
-        [Header("-- Runtime Values")]
         // Varíável que chamada por classes como BeatTrack e SyncedAnimation
         public SongState songState;
 
@@ -37,6 +42,13 @@ namespace RhythmSystem {
 
         // AudioSource onde toca a música
         public AudioSource musicSource;
+
+        // Singleton do Conductor
+        public static Conductor Instance;
+
+        #endregion
+
+        #region SongState
 
         public enum SongState 
         { 
@@ -56,13 +68,27 @@ namespace RhythmSystem {
             get { return songState == SongState.Playing || songState == SongState.Outro; }
         }
 
+        #endregion
+
         private void Awake() 
         {
+            if (Instance != null)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
             songState = SongState.Stopped;    
         }
 
-        // TO-DO: tercerizar essa inicialização para outra classe
-        void Start()
+        //// TO-DO: tercerizar essa inicialização para outra classe
+        //void Start()
+        //{
+        //    SetupConductor(songBpm);
+        //}
+
+        public void SetupConductor(BeatMapData beatMapData)
         {
             // Carrega o AudioSource do GameObject
             musicSource = GetComponent<AudioSource>();
@@ -73,24 +99,21 @@ namespace RhythmSystem {
                 return;
             }
 
+            songBpm = beatMapData.BPM;
+            firstBeatOffset = beatMapData.FirstBeatOffset;
+            beatsShownInAdvance = beatMapData.BeatsShownInAdvance;
+
             // Calcula o tempo em segundos em cada batida
             secPerBeat = 60f / songBpm;
         }
 
-        private void StartConduction()
+        public void StartConduction()
         {
             // Guarda o tempo quando a música começa a tocar
             dspSongTime = (float) AudioSettings.dspTime;
 
-            if (introSilenceBaseFiller <= 0) 
-            {
-                StartMusic();
-            }
-            else 
-            {
-                // Ativa a flag de início do condutor
-                songState = SongState.Intro;
-            }
+            // Ativa a flag de início do condutor
+            songState = SongState.Intro;
         }
 
         private void StartMusic() 
@@ -98,22 +121,28 @@ namespace RhythmSystem {
             // Inicia a música
             musicSource.Play();
 
-            // Ativa a flag de início do condutor
+            // Ativa a flag de início da música
             songState = SongState.Playing;
+        }
+
+        // Retorna um tempo de base pré-definido + o tempo mínimo para que uma nota seja gerada e faça o caminho até o ponto de chegada
+        private float IntroDuration 
+        {
+            get {
+                if (songBpm <= 0)
+                    return introSilenceBaseFiller;
+                else 
+                    return introSilenceBaseFiller + (beatsShownInAdvance * secPerBeat);
+            }
         }
 
         void Update()
         {
-            // Aguarda pelo input do jogador para começar a rodar
             if (!isRunning) 
-            {
-                if (Input.GetKeyDown(KeyCode.Return))
-                    StartConduction();
                 return;
-            }
 
             // Atualiza quantos segundos passaram desde que a música começou
-            songPosition = (float)(AudioSettings.dspTime - dspSongTime - firstBeatOffset - introSilenceBaseFiller);
+            songPosition = (float)(AudioSettings.dspTime - dspSongTime - firstBeatOffset - IntroDuration);
 
             // Atualiza quantas batidas passaram desde que a música começou
             songPositionInBeats = songPosition / secPerBeat;
@@ -121,16 +150,16 @@ namespace RhythmSystem {
             // Verifica se já passou do tempo de silêncio da Intro
             if (!isPlaying) 
             {
-                if (songPosition >= 0)
+                if (songPosition + firstBeatOffset >= 0)
                     StartMusic();
                 return;
             }
         }
 
-        // Aguarda "isPlaying" se tornar "true" para chama a UnityAction 
-        public static IEnumerator WaitForConductor(Conductor conductor, UnityAction action)
+        // Aguarda "isRunning" se tornar "true" para chama a UnityAction 
+        public IEnumerator WaitUntilIsRunning(UnityAction action)
         {
-            yield return new WaitUntil( () => conductor.isRunning );
+            yield return new WaitUntil( () => isRunning );
             action();
         }
     }
