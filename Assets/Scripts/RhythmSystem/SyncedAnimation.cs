@@ -32,7 +32,7 @@ namespace RhythmSystem
         // Update is called once per frame
         void Update()
         {
-            if (!conductor.isPlaying)
+            if (!conductor.isRunning)
                 return;
 
             //Start playing the current animation from wherever the current conductor loop is

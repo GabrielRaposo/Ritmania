@@ -9,13 +9,14 @@ namespace RhythmSystem
         public Conductor conductor; 
         public ObjectPool notesPool;
         public int quantNotes;
-        public float beatsShownInAdvance;
+        public float beatsShownInAdvance; // TO-DO: passar pra outro lugar, conseguir essa info através de inicialização
 
         [Header("Anchors")]
         public Transform spawnAnchor;
         public Transform targetAnchor;
 
         int nextIndex;
+        bool beatmapWasSetup;
 
         //beatmap
         List<float> beatmapInBeats; // Lista com formato acessível
@@ -24,8 +25,9 @@ namespace RhythmSystem
         private void Start() 
         {
             // -- Define beatmap em Beats
-            beatmapInBeats = new List<float>() { 1, 1.5f, 2, 3, 5, 6, 7, 9, 10, 11 };
-            
+            beatmapInBeats = new List<float>() { 0, 1, 1.5f, 2, 4, 5, 6, 8, 9, 10 };
+
+            beatmapWasSetup = false;
             StartCoroutine( Conductor.WaitForConductor(conductor, TranslateToBeatmap) );
         }
 
@@ -37,12 +39,14 @@ namespace RhythmSystem
             {
                 beatmap.Add(beatmapInBeats[i] * conductor.secPerBeat);
             }
+
+            beatmapWasSetup = true;
         }
 
 
         void Update()
         {
-            if (!conductor.isPlaying)
+            if (!beatmapWasSetup)
                 return;
 
             if (nextIndex > beatmap.Count - 1)

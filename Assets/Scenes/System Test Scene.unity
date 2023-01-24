@@ -170,8 +170,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   songBpm: 37.5
-  isPlaying: 0
   firstBeatOffset: 0
+  introSilenceBaseFiller: 3
+  songState: 0
   secPerBeat: 0
   songPosition: 0
   songPositionInBeats: 0
@@ -516,7 +517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   conductor: {fileID: 69734358}
   notesPool: {fileID: 1819757361}
-  quantNotes: 20
+  quantNotes: 30
   beatsShownInAdvance: 2
   spawnAnchor: {fileID: 1148902735}
   targetAnchor: {fileID: 1888598350}
