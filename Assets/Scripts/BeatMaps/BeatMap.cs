@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 public class BeatMap : ScriptableObject
 {
     public AudioClip clip;
-    public float bpm;
+    public int bpm;
 
     public List<BeatCall> callTypes;
     public List<Tuple<float, BeatCall>> calls;

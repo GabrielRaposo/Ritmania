@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66ae43ae8cb5c394c92b960ef9e82b3a, type: 3}
   m_Name: BeatMap
   m_EditorClassIdentifier: 
-  clip: {fileID: 8300000, guid: e723729a74b973e40ad3ea7461c16bed, type: 3}
-  bpm: 0
+  clip: {fileID: 8300000, guid: 31d1353218aab8e429a12a7f90c426e6, type: 3}
+  bpm: 75
   callTypes:
   - awnserDistance: 0
     awnserCount: 1

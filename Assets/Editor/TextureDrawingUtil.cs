@@ -57,7 +57,7 @@ public static class TextureDrawingUtil
     
     
     
-    private static void ColorBlock(this Texture2D t, int width, int height, Color color,
+    public static void ColorBlock(this Texture2D t, int width, int height, Color color,
         int startingX = 0, int startingY = 0)
     {
         for (int i = startingX; i < startingX+width; i++)
@@ -67,5 +67,6 @@ public static class TextureDrawingUtil
                 t.SetPixel(i, j, color);
             }
         }
+        t.Apply();
     }
 }
