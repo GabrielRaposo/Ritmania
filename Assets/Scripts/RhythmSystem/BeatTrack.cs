@@ -6,7 +6,6 @@ namespace RhythmSystem
 {
     public class BeatTrack : MonoBehaviour
     {       
-        public Conductor conductor; 
         public ObjectPool notesPool;
         public int quantNotes;
         public float beatsShownInAdvance; // TO-DO: passar pra outro lugar, conseguir essa info através de inicialização
@@ -17,13 +16,22 @@ namespace RhythmSystem
 
         int nextIndex;
         bool beatmapWasSetup;
+        Conductor conductor; 
 
-        //beatmap
+        // Beatmap
         List<float> beatmapInBeats; // Lista com formato acessível
         List<float> beatmap; // Beatmap de fato, com precisão de tempo em segundos
 
         private void Start() 
         {
+            conductor = Conductor.Instance;
+            if (!conductor)
+            {
+                Debug.LogError("Conductor couldn't be found.");
+                enabled = false;
+                return;
+            }
+
             // -- Define beatmap em Beats
             beatmapInBeats = new List<float>() { 0, 1, 1.5f, 2, 4, 5, 6, 8, 9, 10 };
 
@@ -42,7 +50,6 @@ namespace RhythmSystem
 
             beatmapWasSetup = true;
         }
-
 
         void Update()
         {

@@ -82,12 +82,6 @@ namespace RhythmSystem
             songState = SongState.Stopped;    
         }
 
-        //// TO-DO: tercerizar essa inicialização para outra classe
-        //void Start()
-        //{
-        //    SetupConductor(songBpm);
-        //}
-
         public void SetupConductor(BeatMapData beatMapData)
         {
             // Carrega o AudioSource do GameObject

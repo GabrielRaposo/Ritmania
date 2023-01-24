@@ -152,8 +152,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
-  m_Children:
-  - {fileID: 1617281360}
+  m_Children: []
   m_Father: {fileID: 1289315897}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -305,7 +304,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1289315897}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &224892254
 MonoBehaviour:
@@ -465,6 +464,7 @@ Transform:
   - {fileID: 1864478149}
   - {fileID: 1308169743}
   - {fileID: 69734357}
+  - {fileID: 1617281360}
   - {fileID: 1787817234}
   - {fileID: 224892253}
   m_Father: {fileID: 0}
@@ -547,8 +547,8 @@ Transform:
   - {fileID: 1148902735}
   - {fileID: 1888598350}
   - {fileID: 1819757360}
-  m_Father: {fileID: 69734357}
-  m_RootOrder: 0
+  m_Father: {fileID: 1289315897}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1617281361
 MonoBehaviour:
@@ -562,7 +562,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f8a289dfa4c58640a2110d208f5b642, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  conductor: {fileID: 69734358}
   notesPool: {fileID: 1819757361}
   quantNotes: 30
   beatsShownInAdvance: 2
@@ -599,7 +598,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1289315897}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &1787817235
 AudioSource:
