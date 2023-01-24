@@ -8,58 +8,58 @@ namespace RhythmSystem {
     // -- https://www.gamedeveloper.com/audio/coding-to-the-beat---under-the-hood-of-a-rhythm-game-in-unity
     public class Conductor : MonoBehaviour
     {
-        //Song beats per minute
-        //This is determined by the song you're trying to sync up to
+        // Batidas por minuto
+        // Isto é um atributo originado pela música da qual você está tentando se sincronizar
         public float songBpm;
 
-        public float introSilence;
+            public float introSilence;
 
         [Header("Runtime Values")]
+        // Varíável que chamada por classes como BeatTrack e SyncedAnimation
         public bool isPlaying;
 
-        //The offset to the first beat of the song in seconds
+        // O atraso da primeira batida da música em segundos 
         public float firstBeatOffset;
 
-        //The number of seconds for each song beat
+        // O valor de segundos para cara batida da música
         public float secPerBeat;
 
-        //Current song position, in seconds
+        // Posição na linha do tempo atual da música (em segundos)
         public float songPosition;
 
-        //Current song position, in beats
+        // Posição na linha do tempo atual da música (em batidas)
         public float songPositionInBeats;
 
-        //How many seconds have passed since the song started
+        // Quantos segundos passaram desde que a música começou
         public float dspSongTime;
 
-        //an AudioSource attached to this GameObject that will play the music.
+        // AudioSource onde toca a música
         public AudioSource musicSource;
 
-        // Start is called before the first frame update
         void Start()
         {
-            //Load the AudioSource attached to the Conductor GameObject
+            // Carrega o AudioSource do GameObject
             musicSource = GetComponent<AudioSource>();
 
-            //Calculate the number of seconds in each beat
+            // Calcula o tempo em segundos em cada batida
             secPerBeat = 60f / songBpm;
         }
 
         private void Setup()
         {
-            //Record the time when the music starts
+            // Guarda o tempo quando a música começa a tocar
             dspSongTime = (float) AudioSettings.dspTime;
 
-            //Start the music
+            // Inicia a música
             musicSource.Play();
 
-            //Sync variable used on BeatTrack
+            // Ativa a flag de início do condutor
             isPlaying = true;
         }
 
         void Update()
         {
-            //Wait for player input to start playing
+            // Aguarda pelo input do jogador para começar a rodar
             if (!isPlaying) 
             {
                 if (Input.GetKeyDown(KeyCode.Return))
@@ -67,13 +67,14 @@ namespace RhythmSystem {
                 return;
             }
 
-            //determine how many seconds since the song started
+            // Atualiza quantos segundos passaram desde que a música começou
             songPosition = (float)(AudioSettings.dspTime - dspSongTime - firstBeatOffset);
 
-            //determine how many beats since the song started
+            // Atualiza quantas batidas passaram desde que a música começou
             songPositionInBeats = songPosition / secPerBeat;
         }
 
+        // Aguarda "isPlaying" se tornar "true" para chama a UnityAction 
         public static IEnumerator WaitForConductor(Conductor conductor, UnityAction action)
         {
             yield return new WaitWhile( () => conductor.isPlaying! );
