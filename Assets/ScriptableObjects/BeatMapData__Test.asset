@@ -16,4 +16,4 @@ MonoBehaviour:
   BPM: 75
   BeatsShownInAdvance: 2
   FirstBeatOffset: 0
-  MissThreshold: 0.2
+  MissThreshold: 0.5

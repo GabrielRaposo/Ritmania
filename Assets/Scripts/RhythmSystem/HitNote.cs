@@ -82,7 +82,7 @@ namespace RhythmSystem
 
         public void OnHit()
         {
-            SFXController.Instance.PlaySound();
+            SFXController.Instance.PlaySound("Hit");
             
             if (beatTrack)
                 beatTrack.OnNoteDeactivation(this);
@@ -91,7 +91,7 @@ namespace RhythmSystem
 
         public void OnMiss()
         {
-            Debug.Log("Miss");
+            SFXController.Instance.PlaySound("Miss");
             
             if (beatTrack)
                 beatTrack.OnNoteDeactivation(this);
