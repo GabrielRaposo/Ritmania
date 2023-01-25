@@ -1,15 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 namespace RhythmSystem 
 {
+    public enum PrecisionScore { Perfect, Good, Bad, Miss }
+
     public class RhythmJudge : MonoBehaviour
     {
         const float RANGE_RADIUS = .5f; // Distância mínima para que a nota seja interagível
 
         public Transform cursor;
-        
+        public TextMeshProUGUI feedbackDisplay;
+
         Conductor conductor;
         BeatTrack beatTrack;
 
