@@ -9,16 +9,28 @@ namespace RhythmSystem
     {
         float beatTime;
         float timeShownInAdvance;
-        Conductor conductor;
-        Transform spawnAnchor;
-        Transform targetAnchor;
 
-        public void Setup (float beatTime, float timeShownInAdvance, Conductor conductor, Transform spawnAnchor, Transform targetAnchor)
+        BeatTrack beatTrack;
+        Conductor conductor;
+
+        Transform spawnAnchor;
+        Transform targetAnchor;        
+
+        public float BeatTime { get { return beatTime; } }
+
+        public void Setup 
+        (
+            float beatTime, float timeShownInAdvance, 
+            BeatTrack beatTrack, Conductor conductor, 
+            Transform spawnAnchor, Transform targetAnchor
+        )
         {
             this.beatTime = beatTime;
             this.timeShownInAdvance = timeShownInAdvance;
 
+            this.beatTrack = beatTrack;
             this.conductor = conductor;
+
             this.spawnAnchor = spawnAnchor;
             this.targetAnchor = targetAnchor;
 
@@ -71,13 +83,24 @@ namespace RhythmSystem
         public void OnHit()
         {
             SFXController.Instance.PlaySound();
+            
+            if (beatTrack)
+                beatTrack.OnNoteDeactivation(this);
             gameObject.SetActive(false); 
         }
 
         public void OnMiss()
         {
             Debug.Log("Miss");
+            
+            if (beatTrack)
+                beatTrack.OnNoteDeactivation(this);
             gameObject.SetActive(false); 
+        }
+
+        public float GetBeatTime ()
+        {
+            return beatTime;
         }
     }
 }

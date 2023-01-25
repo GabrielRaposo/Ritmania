@@ -7,6 +7,7 @@ namespace RhythmSystem
     // Classe responsável por gerar as HitNotes
     public class BeatTrack : MonoBehaviour
     {       
+        public RhythmJudge rhythmJudge;
         public ObjectPool notesPool;
         public int quantNotes;
 
@@ -20,7 +21,8 @@ namespace RhythmSystem
 
         // -- Beatmap
         List<float> beatmapInBeats; // Lista com formato acessível para ser escrito
-        List<float> beatmap; // Beatmap de fato, com precisão de tempo em segundos
+        List<float> beatmap;        // Beatmap de fato, com precisão de tempo em segundos
+        List<HitNote> activeNotes;  // Enfilera as notas em tela em ordem de chegada
 
         private void Start() 
         {
@@ -48,7 +50,13 @@ namespace RhythmSystem
                 beatmap.Add(beatmapInBeats[i] * conductor.secPerBeat);
             }
 
+            activeNotes = new List<HitNote>();
+
             beatmapIsReady = true;
+            
+            // -- Ativa a leitura de inputs
+            if (rhythmJudge)
+                rhythmJudge.Setup(conductor, this);
         }
 
         void Update()
@@ -71,11 +79,28 @@ namespace RhythmSystem
                 note.SetActive(true);
 
                 HitNote hitNote = note.GetComponent<HitNote>();
-                if (hitNote) 
-                    hitNote.Setup(currentBeatTime, timeShownInAdvance, conductor, spawnAnchor, targetAnchor);
+                if (hitNote)
+                {
+                    hitNote.Setup(currentBeatTime, timeShownInAdvance, this, conductor, spawnAnchor, targetAnchor);
+                    activeNotes.Add(hitNote); // Enfilera a nota para que seja visível para o Rhythm Judge
+                }
 
                 nextIndex++;
             }
+        }
+
+        public void OnNoteDeactivation (HitNote note)
+        {
+            if (activeNotes == null || activeNotes.Count < 1)
+                return;
+            activeNotes.Remove(note);
+        }
+
+        public HitNote GetActiveHitNote()
+        {
+            if (activeNotes == null || activeNotes.Count < 1)
+                return null;
+            return activeNotes[0];
         }
     }
 }
