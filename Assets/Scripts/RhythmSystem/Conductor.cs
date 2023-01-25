@@ -46,6 +46,26 @@ namespace RhythmSystem
         // Singleton do Conductor
         public static Conductor Instance;
 
+        // Quantos segundos do nascimento de uma nota até que ela alcance o momento do acerto
+        public float TimeShownInAdvance 
+        {
+            get { return beatsShownInAdvance * secPerBeat; }
+        }
+
+        // Limite máximo do quanto a hitnote pode passar do tempo total sem dar um "Miss"
+        public float missThreshold 
+        {
+            get 
+            {
+                if (beatMapData)
+                    // TO-DO: multiplicar esse valor quando opções de acessibilidade estiverem ligadas  
+                    return beatMapData.MissThreshold;
+                return 0;
+            }
+        }
+
+        BeatMapData beatMapData;
+
         #endregion
 
         #region SongState
@@ -93,6 +113,7 @@ namespace RhythmSystem
                 return;
             }
 
+            this.beatMapData = beatMapData;
             songBpm = beatMapData.BPM;
             firstBeatOffset = beatMapData.FirstBeatOffset;
             beatsShownInAdvance = beatMapData.BeatsShownInAdvance;
@@ -122,7 +143,8 @@ namespace RhythmSystem
         // Retorna um tempo de base pré-definido + o tempo mínimo para que uma nota seja gerada e faça o caminho até o ponto de chegada
         private float IntroDuration 
         {
-            get {
+            get 
+            {
                 if (songBpm <= 0)
                     return introSilenceBaseFiller;
                 else 

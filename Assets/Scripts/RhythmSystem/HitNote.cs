@@ -4,17 +4,18 @@ using UnityEngine;
 
 namespace RhythmSystem 
 {
+    // Classe para as notas que devem ser acertadas dentro do ritmo
     public class HitNote : MonoBehaviour
     {
-        float targetBeat;
+        float beatTime;
         float timeShownInAdvance;
         Conductor conductor;
         Transform spawnAnchor;
         Transform targetAnchor;
 
-        public void Setup (float targetBeat, float timeShownInAdvance, Conductor conductor, Transform spawnAnchor, Transform targetAnchor)
+        public void Setup (float beatTime, float timeShownInAdvance, Conductor conductor, Transform spawnAnchor, Transform targetAnchor)
         {
-            this.targetBeat = targetBeat;
+            this.beatTime = beatTime;
             this.timeShownInAdvance = timeShownInAdvance;
 
             this.conductor = conductor;
@@ -26,21 +27,56 @@ namespace RhythmSystem
 
         void Update()
         {
-            float t = (targetBeat - conductor.songPosition);
-            transform.position = Vector2.Lerp(
-                spawnAnchor.position,
-                targetAnchor.position,
-                (timeShownInAdvance - t) / timeShownInAdvance
-            );    
+            float t = (beatTime - conductor.songPosition);
+            float f = (timeShownInAdvance - t) / timeShownInAdvance; 
 
-            // Se estiver com AutoPlay, acerta a nota no primeiro frame válido
-            if (GameManager.AutoPlay && conductor.songPosition >= targetBeat)
-                OnHit();   
+            // Se está entre o ponto de spawn e o ponto de chegada 
+            if (f <= 1.0f) 
+            {
+                // Faz lerp na posição da nota de acordo com o tempo t 
+                transform.position = Vector2.Lerp (
+                    spawnAnchor.position,
+                    targetAnchor.position,
+                    f
+                );
+            }
+            // Se já passou do ponto de chegada, faz overshoot da nota
+            else {
+                // Faz lerp na posição da nota de acordo com o tempo t 
+                transform.position = Vector2.Lerp(
+                    targetAnchor.position,
+                    (targetAnchor.position * 2) - spawnAnchor.position,
+                    f - 1
+                );
+            }
+
+            if (GameManager.AutoPlay)
+            {
+                if (conductor.songPosition >= beatTime) 
+                {
+                    transform.position = targetAnchor.position;
+                    OnHit(); // Se estiver com AutoPlay, acerta a nota no primeiro frame válido
+                }
+                return;
+            }
+
+            // Se não estiver com AutoPlay, verifica se atravessou o MissThreshold
+            if (conductor.songPosition > beatTime + conductor.missThreshold)
+            {
+                OnMiss();
+                return;
+            }
         }
 
-        private void OnHit()
+        public void OnHit()
         {
             SFXController.Instance.PlaySound();
+            gameObject.SetActive(false); 
+        }
+
+        public void OnMiss()
+        {
+            Debug.Log("Miss");
             gameObject.SetActive(false); 
         }
     }

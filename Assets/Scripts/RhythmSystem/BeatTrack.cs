@@ -4,22 +4,22 @@ using UnityEngine;
 
 namespace RhythmSystem 
 {
+    // Classe responsável por gerar as HitNotes
     public class BeatTrack : MonoBehaviour
     {       
         public ObjectPool notesPool;
         public int quantNotes;
-        public float beatsShownInAdvance; // TO-DO: passar pra outro lugar, conseguir essa info através de inicialização
 
         [Header("Anchors")]
         public Transform spawnAnchor;
         public Transform targetAnchor;
 
         int nextIndex;
-        bool beatmapWasSetup;
+        bool beatmapIsReady;
         Conductor conductor; 
 
-        // Beatmap
-        List<float> beatmapInBeats; // Lista com formato acessível
+        // -- Beatmap
+        List<float> beatmapInBeats; // Lista com formato acessível para ser escrito
         List<float> beatmap; // Beatmap de fato, com precisão de tempo em segundos
 
         private void Start() 
@@ -35,7 +35,7 @@ namespace RhythmSystem
             // -- Define beatmap em Beats
             beatmapInBeats = new List<float>() { 0, 1, 1.5f, 2, 4, 5, 6, 8, 9, 10 };
 
-            beatmapWasSetup = false;
+            beatmapIsReady = false;
             StartCoroutine( conductor.WaitUntilIsRunning(TranslateToBeatmap) );
         }
 
@@ -48,12 +48,12 @@ namespace RhythmSystem
                 beatmap.Add(beatmapInBeats[i] * conductor.secPerBeat);
             }
 
-            beatmapWasSetup = true;
+            beatmapIsReady = true;
         }
 
         void Update()
         {
-            if (!beatmapWasSetup)
+            if (!beatmapIsReady)
                 return;
 
             if (nextIndex > beatmap.Count - 1)
@@ -63,7 +63,7 @@ namespace RhythmSystem
             }
 
             float currentBeatTime = beatmap[nextIndex];
-            float timeShownInAdvance = beatsShownInAdvance * conductor.secPerBeat;
+            float timeShownInAdvance = conductor.TimeShownInAdvance;
             if (currentBeatTime < conductor.songPosition + timeShownInAdvance)
             {
                 GameObject note = notesPool.GetFromPool();

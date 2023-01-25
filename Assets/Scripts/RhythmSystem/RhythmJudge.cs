@@ -2,17 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RhythmJudge : MonoBehaviour
+namespace RhythmSystem 
 {
-    // Start is called before the first frame update
-    void Start()
+    public class RhythmJudge : MonoBehaviour
     {
-        
-    }
+        bool isPlaying;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Conductor conductor;
+        BeatTrack beatTrack;
+
+        public void Setup(Conductor conductor, BeatTrack beatTrack) 
+        {
+            this.conductor = conductor;
+            this.beatTrack = beatTrack;
+            isPlaying = true;
+        }
+
+        void Update()
+        {
+            if (!isPlaying)
+                return;
+
+            if (Input.GetKeyDown(KeyCode.Space)) 
+            {
+                Debug.Log("click");
+            }
+        }
     }
 }

@@ -9,4 +9,5 @@ public class BeatMapData : ScriptableObject
     public float BPM;
     public float BeatsShownInAdvance;
     public float FirstBeatOffset;
+    public float MissThreshold;
 }
