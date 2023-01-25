@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mono.Cecil;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -8,10 +9,10 @@ using UnityEngine.Serialization;
 [CustomEditor(typeof(BeatMapper))]
 public class BeatMapperEditor : Editor
 {
-    public SoundInEditor soundInEditorMain;
-    public SoundInEditor soundInEditorBeep;
+    public EditorSoundMaster EditorSound;
 
-    private AudioSource audio;
+    private AudioSource mainAudio;
+    private AudioSource beepAudio;
 
     private Texture2D waveFormTexture;
     private Texture2D middleLineTexture;
@@ -30,58 +31,66 @@ public class BeatMapperEditor : Editor
     private float previousTime;
     private int beatIndex;
 
-
     public override bool RequiresConstantRepaint() => true;
 
+    private float AudioLerp()
+    {
+        if (mainAudio == null)
+            return 0f;
+
+        return mainAudio.time / mainAudio.clip.length;
+    }
+    
     public override void OnInspectorGUI()
     {
-        if (soundInEditorMain == null || soundInEditorMain._AudioSource == null || soundInEditorBeep == null)
+        if (EditorSound == null)
         {
-            soundInEditorMain =
-                (SoundInEditor)EditorGUILayout.ObjectField("Sound In Editor", soundInEditorMain, typeof(SoundInEditor), true);
-            
-            soundInEditorBeep =
-                (SoundInEditor)EditorGUILayout.ObjectField("Beed Sound", soundInEditorBeep, typeof(SoundInEditor), true);
-
-            if (soundInEditorMain != null)
-            {
-                EditorGUILayout.LabelField("AudioSource");
-                soundInEditorMain._AudioSource = (AudioSource)EditorGUILayout.ObjectField(soundInEditorMain._AudioSource, typeof(AudioSource), true);    
-            }
+            EditorSound = (EditorSoundMaster)EditorGUILayout.ObjectField("Sound Controller", EditorSound, typeof(EditorSoundMaster));
+            GUILayout.Label("Add Sound Controller");
+            return;
         }
 
+        EditorGUILayout.BeginVertical("Box"); //base
+        base.OnInspectorGUI();
+        EditorGUILayout.EndVertical(); //0base
+        
         if (GUILayout.Button("Reset Textures"))
             ResetTextures();
-            
         
-        base.OnInspectorGUI();
-
+        GUILayout.Space(8);
+        
         BeatMapper obj = (BeatMapper)target;
-        
-        if(soundInEditorMain == null)
-            return;
-        
-        if(soundInEditorMain._AudioSource == null)
-            return;
 
-        audio = soundInEditorMain._AudioSource;
+        GUILayout.BeginHorizontal(); //E
+        
+        GUILayout.Label("Clip:");
+        obj.clip = (AudioClip)EditorGUILayout.ObjectField("", obj.clip, typeof(AudioClip));
+        GUILayout.Space(8);
+        GUILayout.Label("BPM:");
+        obj.bpm = EditorGUILayout.IntField("", obj.bpm, GUILayout.MaxWidth(50));
+        GUILayout.FlexibleSpace();
+        
+        GUILayout.EndHorizontal(); //0E
 
-        if (audio.clip != obj.clip)
-            audio.clip = obj.clip;
+        mainAudio = EditorSound.mainAudioController._AudioSource;
+        beepAudio = EditorSound.beepController._AudioSource;
+
+        if (mainAudio.clip != obj.clip)
+            mainAudio.clip = obj.clip;
 
         //Values Check
         if (previousClip != obj.clip || previousBpm != obj.bpm)
             OnChangeClip(obj);
 
 
-        var time = audio.time;
+        var time = mainAudio.time;
 
-        if (audio.isPlaying)
+        if (mainAudio.isPlaying)
         {
             if (time > (beatIndex + 1) * obj.BeatLenght)
             {
-                if(soundInEditorBeep!=null)
-                    soundInEditorBeep._AudioSource.Play();
+                if(beepAudio!=null)
+                    beepAudio.Play();
                 //Debug.Log($"BEAT:({time}) [{beatIndex+1}]");
             }
                 
@@ -94,22 +103,25 @@ public class BeatMapperEditor : Editor
         
         GUILayout.Space(5);
         
-        GUILayout.BeginHorizontal();//A
-        
-        if (GUILayout.Button("▶️"))
-            audio.Play();
+        ///PLAY Controller
+        GUILayout.BeginHorizontal(GUILayout.MaxWidth(55));//A
+        if (GUILayout.Button(Resources.Load<Texture2D>("Editor/play")))
+            mainAudio.Play();
 
-        if (GUILayout.Button("P"))
+        if (GUILayout.Button(Resources.Load<Texture2D>("Editor/pause")))
+            mainAudio.Pause();
+
+        if (GUILayout.Button(Resources.Load<Texture2D>("Editor/stop")))
         {
-            audio.Pause();
+            mainAudio.Pause();
+            mainAudio.time = 0;
         }
-
         GUILayout.EndHorizontal(); //A0
 
         //Time line
         
         int timelineH = 65;
-        int timelineW = Mathf.CeilToInt(audio.clip.length * pixelsPerSecond);
+        int timelineW = Mathf.CeilToInt(mainAudio.clip.length * pixelsPerSecond);
 
         timelineScroll = GUILayout.BeginScrollView(timelineScroll, false, false); //S
         
@@ -124,7 +136,19 @@ public class BeatMapperEditor : Editor
 
         var scrollSpaceRect = GUILayoutUtility.GetLastRect();
         
-        GUILayout.Label($"{audio.time/audio.clip.length}");
+        //Scroll timeline mark
+
+        var scrollBarRect = new Rect(scrollSpaceRect.x + 13, scrollSpaceRect.y + scrollSpaceRect.height - 12
+            , scrollSpaceRect.width-26, 12);
+
+        float dotLerp = Mathf.Lerp(scrollBarRect.x,
+            scrollBarRect.position.x + scrollBarRect.width - 13, AudioLerp());
+        
+        var pointRect = new Rect( new Vector2(dotLerp, scrollBarRect.y), new Vector2(12, 12));
+        
+        GUI.DrawTexture(pointRect, Resources.Load<Texture2D>("Editor/dot"));
+        
+        GUILayout.Label($"{AudioLerp()}");
         
         //Calls Buttons
         GUILayout.BeginHorizontal(); //B
@@ -134,7 +158,7 @@ public class BeatMapperEditor : Editor
 
             if (GUILayout.Button($"{index}", GUILayout.MaxWidth(17)))
             {
-                obj.calls.Add(new Tuple<float, BeatCall>(audio.time, obj.callTypes[index]));
+                obj.calls.Add(new Tuple<float, BeatCall>(mainAudio.time, obj.callTypes[index]));
             }
         }
         GUILayout.EndHorizontal(); //B0
@@ -169,8 +193,8 @@ public class BeatMapperEditor : Editor
         {
             if (Event.current.type is EventType.MouseDown or EventType.MouseDrag)
             {
-                //audio.Pause();
-                audio.time = (relativeMousePos.x / timelineRect.width) * audio.clip.length;
+                //mainAudio.Pause();
+                mainAudio.time = (relativeMousePos.x / timelineRect.width) * mainAudio.clip.length;
             }
         
         }
@@ -218,7 +242,7 @@ public class BeatMapperEditor : Editor
 
         int markerLineSize = 1;
 
-        float markerPos = (audio.time / audio.clip.length)*width;
+        float markerPos = AudioLerp()*width;
 
         var bgTex = GetBackgroundTexture(width, height, bgColor);
         
@@ -235,7 +259,7 @@ public class BeatMapperEditor : Editor
 
         // foreach (Tuple<float,BeatCall> beatMapCall in beatMapper.calls)
         // {
-        //     int x = Mathf.RoundToInt((beatMapCall.Item1 / audio.clip.length)*width) - 3;
+        //     int x = Mathf.RoundToInt((beatMapCall.Item1 / mainAudio.clip.length)*width) - 3;
         //     var a = new Rect(r.x+x, r.y, 7, halfHeight);
         //     GUI.DrawTexture(a, arrow);
         // }
@@ -268,7 +292,7 @@ public class BeatMapperEditor : Editor
         
         Debug.Log("Redraw wave texture");
         
-        waveFormTexture = AudioTrackPlotter.GetWaveform(Mathf.RoundToInt(lenght), height, audio.clip, Color.clear, Color.yellow - new Color(0f,0f,0f,0.68f));
+        waveFormTexture = AudioTrackPlotter.GetWaveform(Mathf.RoundToInt(lenght), height, mainAudio.clip, Color.clear, Color.yellow - new Color(0f,0f,0f,0.68f));
 
         return waveFormTexture;
     }
@@ -296,7 +320,7 @@ public class BeatMapperEditor : Editor
         
         middleLineTexture.ColorBlock(lenght, 1, dividerColor, 0, halfH);
 
-        float nOfBeats = (audio.clip.length / 60f) * bpm*4;
+        float nOfBeats = (mainAudio.clip.length / 60f) * bpm*4;
         int beatSize = Mathf.FloorToInt(lenght / nOfBeats);
         
         for (int i = 1; i < nOfBeats; i++)
@@ -333,7 +357,7 @@ public class BeatMapperEditor : Editor
     {
         Debug.Log("On Change Clip");
         beatIndex = 0;
-        previousClip = audio.clip;
+        previousClip = mainAudio.clip;
         previousBpm = obj.bpm;
         ResetTextures();
     }
