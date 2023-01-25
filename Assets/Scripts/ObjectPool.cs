@@ -32,6 +32,7 @@ public class ObjectPool : MonoBehaviour
             go.SetActive(false);
             pool.Add(go);
         }
+        prefab.SetActive(false);
     }
 
 

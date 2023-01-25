@@ -83,7 +83,8 @@ namespace RhythmSystem
         public void OnHit()
         {
             SFXController.Instance.PlaySound("Hit");
-            
+            FeedbackDisplayer.Instance.CallFeedback(PrecisionScore.Perfect);
+
             if (beatTrack)
                 beatTrack.OnNoteDeactivation(this);
             gameObject.SetActive(false); 
@@ -92,6 +93,7 @@ namespace RhythmSystem
         public void OnMiss()
         {
             SFXController.Instance.PlaySound("Miss");
+            FeedbackDisplayer.Instance.CallFeedback(PrecisionScore.Miss);
             
             if (beatTrack)
                 beatTrack.OnNoteDeactivation(this);

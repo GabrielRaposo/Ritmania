@@ -12,7 +12,6 @@ namespace RhythmSystem
         const float RANGE_RADIUS = .5f; // Distância mínima para que a nota seja interagível
 
         public Transform cursor;
-        public TextMeshProUGUI feedbackDisplay;
 
         Conductor conductor;
         BeatTrack beatTrack;
@@ -68,6 +67,7 @@ namespace RhythmSystem
             if (Mathf.Abs(difference) < .2f)
             {
                 focusedNote.OnHit();
+
             }
             else 
             {
