@@ -14,6 +14,4 @@ public class BeatMapper : ScriptableObject
 
     public List<BeatCall> callTypes;
     public List<Tuple<float, BeatCall>> calls;
-
-
 }

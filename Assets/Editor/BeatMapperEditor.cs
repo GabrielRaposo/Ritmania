@@ -40,6 +40,7 @@ public class BeatMapperEditor : Editor
 
         return mainAudio.time / mainAudio.clip.length;
     }
+
     
     public override void OnInspectorGUI()
     {
@@ -147,8 +148,8 @@ public class BeatMapperEditor : Editor
         var pointRect = new Rect( new Vector2(dotLerp, scrollBarRect.y), new Vector2(12, 12));
         
         GUI.DrawTexture(pointRect, Resources.Load<Texture2D>("Editor/dot"));
-        
-        GUILayout.Label($"{AudioLerp()}");
+
+        GUILayout.Label($"{time.ToTimeDisplay()}");
         
         //Calls Buttons
         GUILayout.BeginHorizontal(); //B
