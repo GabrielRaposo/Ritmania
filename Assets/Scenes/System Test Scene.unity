@@ -169,14 +169,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   introSilenceBaseFiller: 0.5
+  songState: 0
   songBpm: 0
   firstBeatOffset: 0
   beatsShownInAdvance: 0
-  songState: 0
   secPerBeat: 0
+  dspSongTime: 0
   songPosition: 0
   songPositionInBeats: 0
-  dspSongTime: 0
   musicSource: {fileID: 0}
 --- !u!82 &69734359
 AudioSource:
@@ -921,6 +921,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beatMapData: {fileID: 11400000, guid: cf6b37840dbf4c14f91176da23cf990d, type: 2}
+  conductor: {fileID: 69734358}
+  beatTrack: {fileID: 1617281361}
 --- !u!1 &1488172366
 GameObject:
   m_ObjectHideFlags: 0

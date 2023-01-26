@@ -39,7 +39,6 @@ namespace RhythmSystem
         public float songPositionInBeats;
 
         public AudioSource musicSource;
-        public static Conductor Instance;
 
         // Source of the song data
         BeatMapData beatMapData;
@@ -91,19 +90,8 @@ namespace RhythmSystem
 
         #endregion
 
-        // Singleton initiation
-        private void Awake() 
-        {
-            if (Instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;  
-        }
-
         // This class should be always set-up by the BeatMapCaller.
-        public void SetupConductor(BeatMapData beatMapData)
+        public void Setup(BeatMapData beatMapData)
         {
             musicSource = GetComponent<AudioSource>();
             if (!musicSource) 
@@ -149,7 +137,7 @@ namespace RhythmSystem
 
             // AudioSettings.dspTime is constantly running during playtime, 
             // so it's necessary to offset it with the "StartConduction()" timestamp
-            songPosition = (float)(AudioSettings.dspTime - dspSongTime - IntroDuration - firstBeatOffset);
+            songPosition = (float)(AudioSettings.dspTime - dspSongTime - IntroDuration);
             songPositionInBeats = songPosition / secPerBeat;
 
             // Starts playing the song at 0:00:000

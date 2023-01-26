@@ -4,19 +4,20 @@ using UnityEngine;
 
 namespace RhythmSystem 
 {
-    // Classe responsável por gerar as HitNotes
+    // Responsible for generating the Hit Notes according to the beatmap data
     public class BeatTrack : MonoBehaviour
     {       
         public RhythmJudge rhythmJudge;
         public ObjectPool notesPool;
         public int quantNotes;
 
+        // Transforms that define the spatial origin and end of the timeline space on the screen
         [Header("Anchors")]
         public Transform spawnAnchor;
         public Transform targetAnchor;
 
-        int nextIndex;
-        bool beatmapIsReady;
+        int nextIndex;        // Last HitNote that's been spawned. 
+        bool beatmapIsReady;  // 
         Conductor conductor; 
 
         // -- Beatmap
@@ -24,17 +25,12 @@ namespace RhythmSystem
         List<float> beatmap;        // Beatmap de fato, com precisão de tempo em segundos
         List<HitNote> activeNotes;  // Enfilera as notas em tela em ordem de chegada
 
-        private void Start() 
+        // This class should be always set-up by the BeatMapCaller.
+        public void Setup (Conductor conductor) 
         {
-            conductor = Conductor.Instance;
-            if (!conductor)
-            {
-                Debug.LogError("Conductor couldn't be found.");
-                enabled = false;
-                return;
-            }
+            this.conductor = conductor;
 
-            // -- Define beatmap em Beats
+            // -- Temp: BeatMap as Beats
             beatmapInBeats = new List<float>() { 0, 1, 1.5f, 2, 4, 5, 6, 8, 9, 10 };
 
             beatmapIsReady = false;
