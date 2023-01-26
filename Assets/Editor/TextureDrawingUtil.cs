@@ -97,13 +97,18 @@ public static class TextureDrawingUtil
         return t;
     }
     
-    public static void PaintColorBlock(this Texture2D t, int width, int height, Color color,
-        int startingX = 0, int startingY = 0)
+    public static void PaintColorBlock(this Texture2D t, int width, int height, Color color, int startingX = 0, int startingY = 0)
     {
         for (int i = startingX; i < startingX+width; i++)
         {
             for (int j = startingY; j < startingY+height; j++)
             {
+                if(i>=t.width)
+                    continue;
+                
+                if(j>=t.height)
+                    continue;
+                
                 t.SetPixel(i, j, color);
             }
         }

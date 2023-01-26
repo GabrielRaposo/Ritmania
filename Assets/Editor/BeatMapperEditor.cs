@@ -258,7 +258,7 @@ public class BeatMapperEditor : Editor
         
         var wave = GetSoundWaveTexture(width, height);
 
-        var dividerTex = GetMiddleLineTexture(width, height, beatMapper.bpm);
+        var dividerTex = GetMiddleLineTexture(width, height, beatMapper);
 
         var arrowsTex = GetArrowsTexture(width, height, beatMapper);
         
@@ -299,7 +299,7 @@ public class BeatMapperEditor : Editor
         return waveFormTexture;
     }
 
-    private Texture2D GetMiddleLineTexture(int lenght, int height, int bpm)
+    private Texture2D GetMiddleLineTexture(int lenght, int height, BeatMapper obj)
     {
         if (height == 1 || lenght == 1)
             return null;
@@ -322,15 +322,19 @@ public class BeatMapperEditor : Editor
         
         middleLineTexture.PaintColorBlock(lenght, 1, dividerColor, 0, halfH);
 
-        float nOfBeats = (mainAudio.clip.length / 60f) * bpm*4;
-        int beatSize = Mathf.FloorToInt(lenght / nOfBeats);
+        float nOfBeats = (mainAudio.clip.length / 60f) * obj.bpm*4;
+        //int beatSize = Mathf.FloorToInt(lenght / nOfBeats);
+        
+        //int x = Mathf.RoundToInt((call.tempo * beatMapper.BeatLenght / mainAudio.clip.length)*lenght) - 4;
         
         for (int i = 1; i < nOfBeats; i++)
         {
+            int x = Mathf.RoundToInt(((i * (obj.BeatLenght/4f) / mainAudio.clip.length)*lenght));
+            
             if(i%4==0)
-                middleLineTexture.PaintColorBlock(1, halfH, dividerColor, i*beatSize, quarterH);
+                middleLineTexture.PaintColorBlock(1, halfH, dividerColor, x, quarterH);
             else
-                middleLineTexture.PaintColorBlock(1, quarterH, dividerColor*new Color(0.7f,0.7f,0.7f), i*beatSize, quarterH+octH);
+                middleLineTexture.PaintColorBlock(1, quarterH, dividerColor*new Color(0.7f,0.7f,0.7f), x, quarterH+octH);
         }
         
         return middleLineTexture;
@@ -375,7 +379,7 @@ public class BeatMapperEditor : Editor
             int responseX = x + Mathf.RoundToInt((beatMapper.BeatLenght * 0.25f / mainAudio.clip.length) * lenght);
             var a = new Rect(x, 0, 9, halfHeight);
             //arrowTexture.PaintColorBlock(9, halfHeight, Color.magenta, x, halfHeight);
-            arrowTexture.OverlayTexture(responseX, 0, downArrow0);
+            //arrowTexture.OverlayTexture(responseX, 0, downArrow0);
             arrowTexture.OverlayTexture(x, halfHeight, arrow0);
         }
 
