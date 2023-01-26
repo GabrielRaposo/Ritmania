@@ -73,7 +73,7 @@ namespace RhythmSystem
             }
 
             // Se não estiver com AutoPlay, verifica se atravessou o MissThreshold
-            if (conductor.songPosition > beatTime + conductor.missThreshold)
+            if (conductor.songPosition > beatTime + conductor.MissThreshold)
             {
                 OnMiss();
                 return;

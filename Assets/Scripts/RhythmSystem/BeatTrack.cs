@@ -38,7 +38,7 @@ namespace RhythmSystem
             beatmapInBeats = new List<float>() { 0, 1, 1.5f, 2, 4, 5, 6, 8, 9, 10 };
 
             beatmapIsReady = false;
-            StartCoroutine( conductor.WaitUntilIsRunning(TranslateToBeatmap) );
+            StartCoroutine( conductor.WaitUntilHasInitiated(TranslateToBeatmap) );
         }
 
         private void TranslateToBeatmap()

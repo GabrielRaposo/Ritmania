@@ -35,7 +35,7 @@ namespace RhythmSystem
         void Update()
         {
             // Aguarda pelo input do jogador para começar a rodar
-            if (!conductor.isRunning)
+            if (!conductor.HasInitiated)
             {
                 if (Input.GetKeyDown(KeyCode.Return))
                      conductor.StartConduction();

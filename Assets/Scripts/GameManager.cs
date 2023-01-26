@@ -15,11 +15,13 @@ public class GameManager : MonoBehaviour
 
     private void Update() 
     {
+        // Toggle de Auto-play
         if (Input.GetKeyDown(KeyCode.A))
         {
             AutoPlay = !AutoPlay;
         }
 
+        // Reset da cena
         if (Input.GetKeyDown(KeyCode.R))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

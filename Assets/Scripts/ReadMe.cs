@@ -1,0 +1,6 @@
+/**
+ * Project Ritmania
+ * 
+ *      Code Structure:
+ * 
+ **/

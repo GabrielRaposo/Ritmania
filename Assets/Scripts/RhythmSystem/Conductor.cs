@@ -5,140 +5,55 @@ using UnityEngine.Events;
 
 namespace RhythmSystem 
 {
-    // -- Classe criada usando como base o link a seguir:
+    // -- Class created following the code at:
     // -- https://www.gamedeveloper.com/audio/coding-to-the-beat---under-the-hood-of-a-rhythm-game-in-unity
     public class Conductor : MonoBehaviour
     {
         #region Variables
 
-        // TO-DO: por enquanto recebe só um valor fixo, depois deve fazer um cálculo de acordo com o beatsShownInAdvance
+        // Base silence duration that should happen at the start of every beatmap. 
         public float introSilenceBaseFiller; 
 
         [Header("-- Runtime Values")]
-        // Batidas por minuto
-        // Isto é um atributo originado pela música da qual você está tentando se sincronizar
-        public float songBpm;
-
-        // O atraso da primeira batida da música em segundos 
-        public float firstBeatOffset;
-
-        // TO-DO: comentar ----------------------
-        public float beatsShownInAdvance;
-
-        // Varíável que chamada por classes como BeatTrack e SyncedAnimation
+        // Flag for the state of the conductor.
         public SongState songState;
 
-        // O valor de segundos para cara batida da música
+        // Current BPM in use. This should be able to change dynamicaly during gameplay.
+        public float songBpm;
+
+        // Some songs don't start on the first second of the file, 
+        // so we need to be able to cut-off the silence to start the beat at the right time.
+        public float firstBeatOffset;
+
+        // This variable defines how much earlier you need to spawn a hit-note before it reaches it's hit-time.
+        public float beatsShownInAdvance;
+
+        // Time between beats. This is necessary to translate beat-based timestamps to time-based ones.
         public float secPerBeat;
 
-        // Posição na linha do tempo atual da música (em segundos)
-        public float songPosition;
-
-        // Posição na linha do tempo atual da música (em batidas)
-        public float songPositionInBeats;
-
-        // Quantos segundos passaram desde que a música começou
+        // The timestamp of when the music started playing according to the Audio System timer.
         public float dspSongTime;
 
-        // AudioSource onde toca a música
-        public AudioSource musicSource;
+        // Song position on the timeline
+        public float songPosition;
+        public float songPositionInBeats;
 
-        // Singleton do Conductor
+        public AudioSource musicSource;
         public static Conductor Instance;
 
-        // Quantos segundos do nascimento de uma nota até que ela alcance o momento do acerto
-        public float TimeShownInAdvance 
-        {
-            get { return beatsShownInAdvance * secPerBeat; }
-        }
-
-        // Limite máximo do quanto a hitnote pode passar do tempo total sem dar um "Miss"
-        public float missThreshold 
-        {
-            get 
-            {
-                if (beatMapData)
-                    // TO-DO: multiplicar esse valor quando opções de acessibilidade estiverem ligadas  
-                    return beatMapData.MissThreshold;
-                return 0;
-            }
-        }
-
+        // Source of the song data
         BeatMapData beatMapData;
 
-        #endregion
+        // How "far" the note can move away from it's hit-spot before it's considered a "miss".
+        public float MissThreshold => beatMapData ? beatMapData.MissThreshold : 0;
+        
+        // The "beatsShownInAdvance" as seconds-based value.
+        public float TimeShownInAdvance => beatsShownInAdvance * secPerBeat;
 
-        #region SongState
-
-        public enum SongState 
-        { 
-            Stopped, // Não começou a tocar ainda 
-            Intro,   // Está no silêncio inicial, antes do AudioSource ser chamado
-            Playing, // AudioSource está tocando a música
-            Outro    // AudioSource já terminou de tocar a música
-        }
-
-        public bool isRunning 
-        {
-            get { return songState != SongState.Stopped; }
-        }
-
-        public bool isPlaying 
-        {
-            get { return songState == SongState.Playing || songState == SongState.Outro; }
-        }
-
-        #endregion
-
-        private void Awake() 
-        {
-            if (Instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            songState = SongState.Stopped;    
-        }
-
-        public void SetupConductor(BeatMapData beatMapData)
-        {
-            // Carrega o AudioSource do GameObject
-            musicSource = GetComponent<AudioSource>();
-
-            if (!musicSource) 
-            {
-                Debug.LogError("The Music audioSource couldn't be found.");
-                return;
-            }
-
-            this.beatMapData = beatMapData;
-            songBpm = beatMapData.BPM;
-            firstBeatOffset = beatMapData.FirstBeatOffset;
-            beatsShownInAdvance = beatMapData.BeatsShownInAdvance;
-
-            // Calcula o tempo em segundos em cada batida
-            secPerBeat = 60f / songBpm;
-        }
-
-        public void StartConduction()
-        {
-            // Guarda o tempo quando a música começa a tocar
-            dspSongTime = (float) AudioSettings.dspTime;
-
-            // Ativa a flag de início do condutor
-            songState = SongState.Intro;
-        }
-
-        private void StartMusic() 
-        {
-            // Inicia a música
-            musicSource.Play();
-
-            // Ativa a flag de início da música
-            songState = SongState.Playing;
-        }
+        // The beatmap timer has negative value during the intro silence, 
+        // so the music should start playing at 0:00:000.
+        // "firstBeatOffset" is used to "shift" the start of the song.
+        public bool HasExitedTheIntro => songPosition + firstBeatOffset >= 0;
 
         // Retorna um tempo de base pré-definido + o tempo mínimo para que uma nota seja gerada e faça o caminho até o ponto de chegada
         private float IntroDuration 
@@ -152,31 +67,94 @@ namespace RhythmSystem
             }
         }
 
-        void Update()
+        #endregion
+
+        #region SongState
+
+        public enum SongState 
+        { 
+            Stopped, // Is playing anymore
+            Intro,   // Initial silence, "songPosition" is at a negative value
+            Playing, // The audioSource is playing, "songPosition" is >= 0
+            Outro    // The conductor received the flag that the beatmap ended
+        }
+
+        public bool HasInitiated => songState != SongState.Stopped;
+
+        public bool SongIsPlaying => songState == SongState.Playing || songState == SongState.Outro;
+
+        public IEnumerator WaitUntilHasInitiated (UnityAction action)
         {
-            if (!isRunning) 
-                return;
+            yield return new WaitUntil( () => HasInitiated );
+            action();
+        }
 
-            // Atualiza quantos segundos passaram desde que a música começou
-            songPosition = (float)(AudioSettings.dspTime - dspSongTime - firstBeatOffset - IntroDuration);
+        #endregion
 
-            // Atualiza quantas batidas passaram desde que a música começou
-            songPositionInBeats = songPosition / secPerBeat;
-
-            // Verifica se já passou do tempo de silêncio da Intro
-            if (!isPlaying) 
+        // Singleton initiation
+        private void Awake() 
+        {
+            if (Instance != null)
             {
-                if (songPosition + firstBeatOffset >= 0)
-                    StartMusic();
+                Destroy(gameObject);
                 return;
+            }
+            Instance = this;  
+        }
+
+        // This class should be always set-up by the BeatMapCaller.
+        public void SetupConductor(BeatMapData beatMapData)
+        {
+            musicSource = GetComponent<AudioSource>();
+            if (!musicSource) 
+            {
+                Debug.LogError("The Music audioSource couldn't be found.");
+                return;
+            }
+
+            this.beatMapData = beatMapData;
+            
+            // Local values initialization
+            // TO-DO: songBPM and firstBeatOffset should be able to change dynamicaly.
+            { 
+                songBpm = beatMapData.BPM; 
+                secPerBeat = 60f / songBpm;
+            
+                firstBeatOffset = beatMapData.FirstBeatOffset;
+                beatsShownInAdvance = beatMapData.BeatsShownInAdvance;
             }
         }
 
-        // Aguarda "isRunning" se tornar "true" para chama a UnityAction 
-        public IEnumerator WaitUntilIsRunning(UnityAction action)
+        // The beatmap should always have a silenced intro so the notes have time to spawn,
+        // so we start the conduction before the song itself.
+        public void StartConduction()
         {
-            yield return new WaitUntil( () => isRunning );
-            action();
+            // Saves the current timestamp so it can be used as an offset to the song time calculation.
+            dspSongTime = (float) AudioSettings.dspTime;
+
+            // Notify that the conductor is running, but the song is not playing yet.
+            songState = SongState.Intro;
+        }
+
+        private void StartMusic() 
+        {
+            musicSource?.Play();
+            songState = SongState.Playing;
+        }
+
+        void Update()
+        {
+            if (!HasInitiated) 
+                return;
+
+            // AudioSettings.dspTime is constantly running during playtime, 
+            // so it's necessary to offset it with the "StartConduction()" timestamp
+            songPosition = (float)(AudioSettings.dspTime - dspSongTime - IntroDuration - firstBeatOffset);
+            songPositionInBeats = songPosition / secPerBeat;
+
+            // Starts playing the song at 0:00:000
+            if (!SongIsPlaying && HasExitedTheIntro) 
+                StartMusic();
         }
     }
 }
