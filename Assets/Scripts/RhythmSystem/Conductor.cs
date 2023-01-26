@@ -122,7 +122,9 @@ namespace RhythmSystem
 
         private void StartMusic() 
         {
-            musicSource?.Play();
+            musicSource.Play();
+            dspSongTime = (float) AudioSettings.dspTime;
+
             songState = SongState.Playing;
         }
 
@@ -133,12 +135,17 @@ namespace RhythmSystem
 
             // AudioSettings.dspTime is constantly running during playtime, 
             // so it's necessary to offset it with the "StartConduction()" timestamp
-            songPosition = (float)(AudioSettings.dspTime - dspSongTime - IntroDuration);
+            if (songState == SongState.Intro)
+                songPosition = (float)(AudioSettings.dspTime - dspSongTime - IntroDuration);
+            else 
+                songPosition = (float)(AudioSettings.dspTime - dspSongTime);
+
             songPositionInBeats = songPosition / secPerBeat;
 
             // Starts playing the song at 0:00:000
             if (!SongIsPlaying && HasExitedTheIntro) 
                 StartMusic();
+
         }
     }
 }

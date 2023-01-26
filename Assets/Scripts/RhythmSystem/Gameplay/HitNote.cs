@@ -7,6 +7,7 @@ namespace RhythmSystem
     // Classe para as notas que devem ser acertadas dentro do ritmo
     public class HitNote : MonoBehaviour
     {
+        const float AUTOPLAY_THRESHOLD = .01f;
         float beatTime;
         float timeShownInAdvance;
 
@@ -38,7 +39,7 @@ namespace RhythmSystem
             gameObject.SetActive(true);
         }
 
-        void Update()
+        void LateUpdate()
         {
             float t = (beatTime - conductor.songPosition);
             float f = (timeShownInAdvance - t) / timeShownInAdvance; 
@@ -65,9 +66,11 @@ namespace RhythmSystem
 
             if (GameManager.AutoPlay)
             {
-                if (conductor.songPosition >= beatTime) 
+                float hitOffset = conductor.songPosition - beatTime;
+                if (Mathf.Abs(hitOffset) < AUTOPLAY_THRESHOLD || conductor.songPosition >= beatTime)
                 {
                     transform.position = targetAnchor.position;
+                    Debug.Log($"Offset: { hitOffset.ToString("0.0000") }");
                     OnHit(); // Se estiver com AutoPlay, acerta a nota no primeiro frame válido
                 }
                 return;
