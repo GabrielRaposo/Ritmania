@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45a72f3371cef2c4e868de24e0f44869, type: 3}
   m_Name: BeatMapData__Test
   m_EditorClassIdentifier: 
-  Music: {fileID: 8300000, guid: e723729a74b973e40ad3ea7461c16bed, type: 3}
+  Music: {fileID: 8300000, guid: 31d1353218aab8e429a12a7f90c426e6, type: 3}
   BPM: 75
   BeatsShownInAdvance: 2
-  FirstBeatOffset: 0
+  FirstBeatOffset: 0.05
   MissThreshold: 0.5

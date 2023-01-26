@@ -35,6 +35,7 @@ namespace RhythmSystem
             this.targetAnchor = targetAnchor;
 
             transform.position = spawnAnchor.position;
+            gameObject.SetActive(true);
         }
 
         void Update()

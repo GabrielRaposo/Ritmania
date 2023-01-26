@@ -90,7 +90,7 @@ namespace RhythmSystem
             musicSource = GetComponent<AudioSource>();
             if (!musicSource) 
             {
-                Debug.LogError("The Music audioSource couldn't be found.");
+                this.ShowErrorAndDisable("The Music audioSource couldn't be found.");
                 return;
             }
 
@@ -99,6 +99,8 @@ namespace RhythmSystem
             // Local values initialization
             // TO-DO: songBPM and firstBeatOffset should be able to change dynamicaly.
             { 
+                musicSource.clip = beatMapData.Music;
+
                 songBpm = beatMapData.BPM; 
                 secPerBeat = 60f / songBpm;
             
