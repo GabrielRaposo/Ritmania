@@ -64,7 +64,7 @@ namespace RhythmSystem
             if (Mathf.Abs(difference) > RANGE_RADIUS) 
                 return;
 
-            if (Mathf.Abs(difference) < .2f)
+            if (Mathf.Abs(difference) < .1f)
             {
                 focusedNote.OnHit();
 

@@ -11,7 +11,7 @@ public class RaposUtil
         return (t.right * v.x) + (t.up * v.y);
     }
 
-    public static Vector2 RotateVector(Vector2 v, float a)
+    public static Vector2 RotateVector (Vector2 v, float a)
     {
         float radians = a * Mathf.Deg2Rad;
         float sin = Mathf.Sin(radians);
@@ -29,17 +29,17 @@ public class RaposUtil
         return diff < -180 ? diff + 360 : diff;
     }
 
-    public static void Wait(MonoBehaviour script, int frames, UnityAction action) 
+    public static void Wait (MonoBehaviour script, int frames, UnityAction action) 
     {
         script.StartCoroutine( Wait(frames, action) );
     }
 
-    public static void WaitSeconds(MonoBehaviour script, float duration, UnityAction action) 
+    public static void WaitSeconds (MonoBehaviour script, float duration, UnityAction action) 
     {
         script.StartCoroutine( WaitSeconds(duration, action) );
     }
 
-    public static void WaitSecondsRealtime(MonoBehaviour script, float duration, UnityAction action) 
+    public static void WaitSecondsRealtime (MonoBehaviour script, float duration, UnityAction action) 
     {
         script.StartCoroutine( WaitSecondsRealtime(duration, action) );
     }
@@ -90,6 +90,12 @@ public class RaposUtil
 
 public static class MonobehaviourExtension
 {
+    public static void ShowErrorAndDisable (this MonoBehaviour m, string msg)
+    {
+        Debug.LogError(msg);
+        m.enabled = false;
+    }
+
     public static void Wait (this MonoBehaviour m, int frames, UnityAction action)
     {
         RaposUtil.Wait(m, frames, action);

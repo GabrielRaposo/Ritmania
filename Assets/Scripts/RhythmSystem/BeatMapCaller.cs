@@ -12,21 +12,20 @@ namespace RhythmSystem
         public Conductor conductor;
         public BeatTrack beatTrack;
 
-        public bool BeatMapDataIsInvalid => !beatMapData || !beatMapData.Music || beatMapData.BPM <= 0;
+        private bool BeatMapDataIsInvalid => !beatMapData || !beatMapData.Music || beatMapData.BPM <= 0;
+        private bool ComponentsAreMissing => !conductor || !beatTrack;
 
         void Start()
         {
             if (BeatMapDataIsInvalid)
             {
-                Debug.LogError("Invalid beatmap data.");
-                enabled = false;
+                this.ShowErrorAndDisable("Invalid beatmap data.");
                 return;
             }
 
-            if (!conductor || !beatTrack) 
+            if (ComponentsAreMissing) 
             {
-                Debug.LogError("Some components are missing on the BeatMapCaller.");
-                enabled = false;
+                this.ShowErrorAndDisable("Some components are missing on the BeatMapCaller.");
                 return;
             }
 
@@ -41,7 +40,13 @@ namespace RhythmSystem
                 return;
             
             if (Input.GetKeyDown(KeyCode.Return))
-                    conductor.StartConduction();   
+                StartBeatMap();
+        }
+
+        private void StartBeatMap()
+        {
+            conductor.StartConduction();   
+            beatTrack.StartBeatMap();
         }
     }
 }

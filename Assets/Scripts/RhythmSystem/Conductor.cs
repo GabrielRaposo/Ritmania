@@ -82,12 +82,6 @@ namespace RhythmSystem
 
         public bool SongIsPlaying => songState == SongState.Playing || songState == SongState.Outro;
 
-        public IEnumerator WaitUntilHasInitiated (UnityAction action)
-        {
-            yield return new WaitUntil( () => HasInitiated );
-            action();
-        }
-
         #endregion
 
         // This class should be always set-up by the BeatMapCaller.

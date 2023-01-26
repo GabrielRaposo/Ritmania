@@ -15,5 +15,5 @@ MonoBehaviour:
   Music: {fileID: 8300000, guid: e723729a74b973e40ad3ea7461c16bed, type: 3}
   BPM: 75
   BeatsShownInAdvance: 2
-  FirstBeatOffset: 0.1
+  FirstBeatOffset: 0
   MissThreshold: 0.5

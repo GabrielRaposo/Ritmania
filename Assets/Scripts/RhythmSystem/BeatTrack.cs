@@ -9,80 +9,84 @@ namespace RhythmSystem
     {       
         public RhythmJudge rhythmJudge;
         public ObjectPool notesPool;
-        public int quantNotes;
 
-        // Transforms that define the spatial origin and end of the timeline space on the screen
+        // Anchors that define the start and end positions of the timeline on the screen
         [Header("Anchors")]
         public Transform spawnAnchor;
         public Transform targetAnchor;
 
         int nextIndex;        // Last HitNote that's been spawned. 
-        bool beatmapIsReady;  // 
-        Conductor conductor; 
+        bool beatmapIsReady;  // Is set to true when the list of hitnotes is prepared
 
         // -- Beatmap
         List<float> beatmapInBeats; // Lista com formato acessível para ser escrito
         List<float> beatmap;        // Beatmap de fato, com precisão de tempo em segundos
         List<HitNote> activeNotes;  // Enfilera as notas em tela em ordem de chegada
 
+        Conductor conductor; 
+
         // This class should be always set-up by the BeatMapCaller.
-        public void Setup (Conductor conductor) 
+        public void Setup (Conductor conductor) // -- TO-DO: receive beatmap data as well
         {
             this.conductor = conductor;
 
+            activeNotes = new List<HitNote>();
+
             // -- Temp: BeatMap as Beats
             beatmapInBeats = new List<float>() { 0, 1, 1.5f, 2, 4, 5, 6, 8, 9, 10 };
+            TranslateToBeatmap();
 
             beatmapIsReady = false;
-            StartCoroutine( conductor.WaitUntilHasInitiated(TranslateToBeatmap) );
         }
 
-        private void TranslateToBeatmap()
+        // Translates the beatmap from beat's to second's timestamps
+        public void TranslateToBeatmap()
         {
-            // -- Transforma beatmap em divisões de segundos
             beatmap = new List<float>();
             for (int i = 0; i < beatmapInBeats.Count; i++) 
             {
                 beatmap.Add(beatmapInBeats[i] * conductor.secPerBeat);
             }
+        }
 
-            activeNotes = new List<HitNote>();
-
-            beatmapIsReady = true;
-            
-            // -- Ativa a leitura de inputs
+        public void StartBeatMap()
+        {
+            // Activates the gameplay controls
             if (rhythmJudge)
                 rhythmJudge.Setup(conductor, this);
+
+            beatmapIsReady = true;
         }
+
+        private bool SpawnedAllNotes => nextIndex > beatmap.Count - 1;
 
         void Update()
         {
             if (!beatmapIsReady)
                 return;
 
-            if (nextIndex > beatmap.Count - 1)
-            {
-                // TO-DO: flag de termino de beatmap
-                return;
-            }
+            if (SpawnedAllNotes)
+                return; // TO-DO: flag de termino de beatmap
 
-            float currentBeatTime = beatmap[nextIndex];
+            float currentNoteTime = beatmap[nextIndex];
             float timeShownInAdvance = conductor.TimeShownInAdvance;
-            if (currentBeatTime < conductor.songPosition + timeShownInAdvance)
-            {
-                GameObject note = notesPool.GetFromPool();
-                note.transform.position = Vector2.right * nextIndex;
-                note.SetActive(true);
+            if (conductor.songPosition + timeShownInAdvance > currentNoteTime)
+                SpawnHitNote (currentNoteTime, timeShownInAdvance);
+        }
 
-                HitNote hitNote = note.GetComponent<HitNote>();
-                if (hitNote)
-                {
-                    hitNote.Setup(currentBeatTime, timeShownInAdvance, this, conductor, spawnAnchor, targetAnchor);
-                    activeNotes.Add(hitNote); // Enfilera a nota para que seja visível para o Rhythm Judge
-                }
+        private void SpawnHitNote(float currentNoteTime, float timeShownInAdvance)
+        {
+            GameObject note = notesPool.GetFromPool();
+            note.SetActive(true);
 
-                nextIndex++;
-            }
+            HitNote hitNote = note.GetComponent<HitNote>();
+            if (!hitNote)
+                return;
+
+            hitNote.Setup(currentNoteTime, timeShownInAdvance, this, conductor, spawnAnchor, targetAnchor);
+            activeNotes.Add(hitNote); // Enqueue the Hit Notes so they are visible by the Rhythm Judge in order
+            
+            nextIndex++;
         }
 
         public void OnNoteDeactivation (HitNote note)
