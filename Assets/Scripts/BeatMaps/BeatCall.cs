@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class BeatCall
 {
-    public float awnserDistance;
+    public int awnserDistance;
     
     public  int awnserCount;
     public  int awnsersSpacing;

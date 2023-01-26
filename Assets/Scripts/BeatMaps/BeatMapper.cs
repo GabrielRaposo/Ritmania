@@ -13,5 +13,23 @@ public class BeatMapper : ScriptableObject
     public float BeatLenght => 60f / bpm;
 
     public List<BeatCall> callTypes;
-    public List<Tuple<float, BeatCall>> calls;
+    public List<BeatTiming> calls;
 }
+
+[System.Serializable]
+public class BeatTiming
+{
+    public int tempo;
+    public int compass;
+
+    public BeatCall call;
+
+    public BeatTiming(int t, int c, BeatCall call)
+    {
+        tempo = t;
+        compass = c;
+        this.call = call;
+    }
+    
+}
+
