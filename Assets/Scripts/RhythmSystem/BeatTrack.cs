@@ -20,7 +20,7 @@ namespace RhythmSystem
 
         // -- Beatmap
         List<float> beatmapInBeats; // Lista com formato acessível para ser escrito
-        List<float> beatmap;        // Beatmap de fato, com precisão de tempo em segundos
+        List<double> beatmap;        // Beatmap de fato, com precisão de tempo em segundos
         List<HitNote> activeNotes;  // Enfilera as notas em tela em ordem de chegada
 
         Conductor conductor; 
@@ -46,7 +46,7 @@ namespace RhythmSystem
         public void TranslateToBeatmap()
         {
             Debug.Log($"beatMap: (conductor.secPerBeat: {conductor.secPerBeat})");
-            beatmap = new List<float>();
+            beatmap = new List<double>();
             for (int i = 0; i < beatmapInBeats.Count; i++) 
             {
                 beatmap.Add(beatmapInBeats[i] * conductor.secPerBeat);
@@ -73,8 +73,8 @@ namespace RhythmSystem
             if (SpawnedAllNotes)
                 return;
 
-            float currentNoteTime = beatmap[nextIndex];
-            float timeShownInAdvance = conductor.TimeShownInAdvance;
+            double currentNoteTime = beatmap[nextIndex];
+            double timeShownInAdvance = conductor.TimeShownInAdvance;
 
             // If it's X-seconds before the time for the note to be hit, spawn it
             if (conductor.songPosition + timeShownInAdvance > currentNoteTime)
@@ -84,7 +84,7 @@ namespace RhythmSystem
             }
         }
 
-        private void SpawnHitNote(float currentNoteTime, float timeShownInAdvance)
+        private void SpawnHitNote(double currentNoteTime, double timeShownInAdvance)
         { 
             GameObject note = notesPool.GetFromPool();
             HitNote hitNote = note.GetComponent<HitNote>();

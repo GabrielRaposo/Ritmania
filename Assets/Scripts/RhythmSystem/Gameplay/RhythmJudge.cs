@@ -47,7 +47,7 @@ namespace RhythmSystem
             if (cursor)
             {
                 cursor.position = focusedNote.transform.position;
-                cursor.localScale = Vector2.one * (Mathf.Abs(focusedNote.BeatTime - conductor.songPosition) < RANGE_RADIUS ? 1 : .8f);
+                cursor.localScale = Vector2.one * (Mathf.Abs((float)(focusedNote.BeatTime - conductor.songPosition)) < RANGE_RADIUS ? 1 : .8f);
             }
 
             // Lê input e tenta acertar nota
@@ -55,16 +55,16 @@ namespace RhythmSystem
                 HitNote(conductor.songPosition);
         }
 
-        private void HitNote(float hitTime)
+        private void HitNote(double hitTime)
         {
-            float difference = focusedNote.BeatTime - hitTime;
+            double difference = focusedNote.BeatTime - hitTime;
             //Debug.Log($"hit time: {hitTime}, difference: {difference}" );
 
             // Se a nota estiver muito longe ainda, nem tenta apertar
-            if (Mathf.Abs(difference) > RANGE_RADIUS) 
+            if (Mathf.Abs((float)difference) > RANGE_RADIUS) 
                 return;
 
-            if (Mathf.Abs(difference) < .1f)
+            if (Mathf.Abs((float)difference) < .1f)
             {
                 focusedNote.OnHit();
 

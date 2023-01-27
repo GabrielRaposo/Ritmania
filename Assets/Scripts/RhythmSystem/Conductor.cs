@@ -12,7 +12,7 @@ namespace RhythmSystem
         #region Variables
 
         // Base silence duration that should happen at the start of every beatmap. 
-        public float introSilenceBaseFiller; 
+        public double introSilenceBaseFiller; 
 
         [Header("-- Runtime Values")]
         // Flag for the state of the conductor.
@@ -23,20 +23,20 @@ namespace RhythmSystem
 
         // Some songs don't start on the first second of the file, 
         // so we need to be able to cut-off the silence to start the beat at the right time.
-        public float firstBeatOffset;
+        public double firstBeatOffset;
 
         // This variable defines how much earlier you need to spawn a hit-note before it reaches it's hit-time.
         public float beatsShownInAdvance;
 
         // Time between beats. This is necessary to translate beat-based timestamps to time-based ones.
-        public float secPerBeat;
+        public double secPerBeat;
 
         // The timestamp of when the music started playing according to the Audio System timer.
-        public float dspSongTime;
+        public double dspSongTime;
 
         // Song position on the timeline
-        public float songPosition;
-        public float songPositionInBeats;
+        public double songPosition;
+        public double songPositionInBeats;
 
         public AudioSource musicSource;
 
@@ -47,7 +47,7 @@ namespace RhythmSystem
         public float MissThreshold => beatMapData ? beatMapData.MissThreshold : 0;
         
         // The "beatsShownInAdvance" as seconds-based value.
-        public float TimeShownInAdvance => beatsShownInAdvance * secPerBeat;
+        public double TimeShownInAdvance => beatsShownInAdvance * secPerBeat;
 
         // The beatmap timer has negative value during the intro silence, 
         // so the music should start playing at 0:00:000.
@@ -55,7 +55,7 @@ namespace RhythmSystem
         public bool HasExitedTheIntro => songPosition + firstBeatOffset >= 0;
 
         // Retorna um tempo de base pré-definido + o tempo mínimo para que uma nota seja gerada e faça o caminho até o ponto de chegada
-        private float IntroDuration 
+        private double IntroDuration 
         {
             get 
             {
@@ -90,7 +90,7 @@ namespace RhythmSystem
             musicSource = GetComponent<AudioSource>();
             if (!musicSource) 
             {
-                this.ShowErrorAndDisable("The Music audioSource couldn't be found.");
+                this.ShowErrorAndDisable("The music AudioSource couldn't be found.");
                 return;
             }
 
@@ -102,7 +102,7 @@ namespace RhythmSystem
                 musicSource.clip = beatMapData.Music;
 
                 songBpm = beatMapData.BPM; 
-                secPerBeat = 60f / songBpm;
+                secPerBeat = 60d / songBpm;
             
                 firstBeatOffset = beatMapData.FirstBeatOffset;
                 beatsShownInAdvance = beatMapData.BeatsShownInAdvance;
@@ -114,7 +114,7 @@ namespace RhythmSystem
         public void StartConduction()
         {
             // Saves the current timestamp so it can be used as an offset to the song time calculation.
-            dspSongTime = (float) AudioSettings.dspTime;
+            dspSongTime = AudioSettings.dspTime;
 
             // Notify that the conductor is running, but the song is not playing yet.
             songState = SongState.Intro;
@@ -123,7 +123,7 @@ namespace RhythmSystem
         public void StartMusic() 
         {
             musicSource.Play();
-            dspSongTime = (float) AudioSettings.dspTime;
+            dspSongTime = AudioSettings.dspTime;
 
             songState = SongState.Playing;
         }
@@ -133,12 +133,23 @@ namespace RhythmSystem
             if (!HasInitiated) 
                 return;
 
-            // AudioSettings.dspTime is constantly running during playtime, 
-            // so it's necessary to offset it with the "StartConduction()" timestamp
-            if (songState == SongState.Intro)
-                songPosition = (float)(AudioSettings.dspTime - dspSongTime - IntroDuration);
-            else 
-                songPosition = (float)(AudioSettings.dspTime - dspSongTime);
+            switch (songState)
+            {
+                case SongState.Intro:
+                    // -- AudioSettings.dspTime is constantly running during playtime, 
+                    // -- so it's necessary to offset it with the timestamp of the beginning of the beatmap
+                    songPosition = AudioSettings.dspTime - dspSongTime - IntroDuration;
+                    break;
+
+                case SongState.Playing:
+                    songPosition = AudioSettings.dspTime - dspSongTime; 
+                    //songPosition = musicSource.time - firstBeatOffset;
+                    break;
+
+                case SongState.Outro:
+                    // -- TO-DO
+                    break;
+            }
 
             songPositionInBeats = songPosition / secPerBeat;
 

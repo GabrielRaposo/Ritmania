@@ -36,7 +36,7 @@ namespace RhythmSystem
                 return;
 
             //Start playing the current animation from wherever the current conductor loop is
-            animator.Play(currentState, -1, (conductor.songPositionInBeats));
+            animator.Play(currentState, -1, (float)(conductor.songPositionInBeats));
             //Set the speed to 0 so it will only change frames when you next update it
             animator.speed = 0;
         }

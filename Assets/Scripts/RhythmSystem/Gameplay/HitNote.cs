@@ -7,9 +7,9 @@ namespace RhythmSystem
     // Classe para as notas que devem ser acertadas dentro do ritmo
     public class HitNote : MonoBehaviour
     {
-        const float AUTOPLAY_THRESHOLD = .01f;
-        float beatTime;
-        float timeShownInAdvance;
+        const double AUTOPLAY_THRESHOLD = .01d;
+        double beatTime;
+        double timeShownInAdvance;
 
         BeatTrack beatTrack;
         Conductor conductor;
@@ -17,11 +17,11 @@ namespace RhythmSystem
         Transform spawnAnchor;
         Transform targetAnchor;        
 
-        public float BeatTime { get { return beatTime; } }
+        public double BeatTime => beatTime;
 
         public void Setup 
         (
-            float beatTime, float timeShownInAdvance, 
+            double beatTime, double timeShownInAdvance, 
             BeatTrack beatTrack, Conductor conductor, 
             Transform spawnAnchor, Transform targetAnchor
         )
@@ -39,19 +39,19 @@ namespace RhythmSystem
             gameObject.SetActive(true);
         }
 
-        void LateUpdate()
+        void LateUpdate ()
         {
-            float t = (beatTime - conductor.songPosition);
-            float f = (timeShownInAdvance - t) / timeShownInAdvance; 
+            double t = (beatTime - conductor.songPosition);
+            double f = (timeShownInAdvance - t) / timeShownInAdvance; 
 
             // Se está entre o ponto de spawn e o ponto de chegada 
-            if (f <= 1.0f) 
+            if (f <= 1.0d) 
             {
                 // Faz lerp na posição da nota de acordo com o tempo t 
                 transform.position = Vector2.Lerp (
                     spawnAnchor.position,
                     targetAnchor.position,
-                    f
+                    (float) f
                 );
             }
             // Se já passou do ponto de chegada, faz overshoot da nota
@@ -60,14 +60,14 @@ namespace RhythmSystem
                 transform.position = Vector2.Lerp(
                     targetAnchor.position,
                     (targetAnchor.position * 2) - spawnAnchor.position,
-                    f - 1
+                    (float)f - 1
                 );
             }
 
             if (GameManager.AutoPlay)
             {
-                float hitOffset = conductor.songPosition - beatTime;
-                if (Mathf.Abs(hitOffset) < AUTOPLAY_THRESHOLD || conductor.songPosition >= beatTime)
+                double hitOffset = conductor.songPosition - beatTime;
+                if (Mathf.Abs((float)hitOffset) < AUTOPLAY_THRESHOLD || conductor.songPosition >= beatTime)
                 {
                     transform.position = targetAnchor.position;
                     Debug.Log($"Offset: { hitOffset.ToString("0.0000") }");
@@ -102,11 +102,6 @@ namespace RhythmSystem
             if (beatTrack)
                 beatTrack.OnNoteDeactivation(this);
             gameObject.SetActive(false); 
-        }
-
-        public float GetBeatTime ()
-        {
-            return beatTime;
         }
     }
 }
