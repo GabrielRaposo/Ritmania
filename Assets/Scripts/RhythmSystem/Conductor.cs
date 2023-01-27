@@ -14,6 +14,8 @@ namespace RhythmSystem
         // Base silence duration that should happen at the start of every beatmap. 
         public double introSilenceBaseFiller; 
 
+        public bool playBPMTest;
+
         [Header("-- Runtime Values")]
         // Flag for the state of the conductor.
         public SongState songState;
@@ -145,11 +147,23 @@ namespace RhythmSystem
             }
 
             songPositionInBeats = songPosition / secPerBeat;
+            
+            if (playBPMTest) 
+                TestSoundBPM();
 
             // Starts playing the song at 0:00:000
             if (!SongIsPlaying && HasExitedTheIntro) 
                 StartMusic();
+        }
 
+        int currentBeat = 0;
+        private void TestSoundBPM()
+        {
+            if (songPositionInBeats < currentBeat)
+                return;
+
+            SFXController.Instance.PlaySound("Hit");
+            currentBeat++;
         }
     }
 }

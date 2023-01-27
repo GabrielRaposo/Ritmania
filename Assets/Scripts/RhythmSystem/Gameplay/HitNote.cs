@@ -4,10 +4,11 @@ using UnityEngine;
 
 namespace RhythmSystem 
 {
-    // Classe para as notas que devem ser acertadas dentro do ritmo
+    // Notes that need to be hit rhythmically
     public class HitNote : MonoBehaviour
     {
         const double AUTOPLAY_THRESHOLD = .01d;
+
         double beatTime;
         double timeShownInAdvance;
 
@@ -44,28 +45,7 @@ namespace RhythmSystem
             if (!conductor.HasInitiated)
                 return;
                 
-            double t = (beatTime - conductor.songPosition);
-            double f = (timeShownInAdvance - t) / timeShownInAdvance; 
-
-            // Se está entre o ponto de spawn e o ponto de chegada 
-            if (f <= 1.0d) 
-            {
-                // Faz lerp na posição da nota de acordo com o tempo t 
-                transform.position = Vector2.Lerp (
-                    spawnAnchor.position,
-                    targetAnchor.position,
-                    (float) f
-                );
-            }
-            // Se já passou do ponto de chegada, faz overshoot da nota
-            else {
-                // Faz lerp na posição da nota de acordo com o tempo t 
-                transform.position = Vector2.Lerp(
-                    targetAnchor.position,
-                    (targetAnchor.position * 2) - spawnAnchor.position,
-                    (float)f - 1
-                );
-            }
+            LerpPosition();
 
             if (GameManager.AutoPlay)
             {
@@ -74,16 +54,42 @@ namespace RhythmSystem
                 {
                     transform.position = targetAnchor.position;
                     Debug.Log($"Offset: { hitOffset.ToString("0.0000") }");
-                    OnHit(); // Se estiver com AutoPlay, acerta a nota no primeiro frame válido
+                    OnHit();
                 }
                 return;
             }
 
-            // Se não estiver com AutoPlay, verifica se atravessou o MissThreshold
+            // If AutoPlay is off, verify if the note has crossed the MissThreshold
             if (conductor.songPosition > beatTime + conductor.MissThreshold)
             {
                 OnMiss();
                 return;
+            }
+        }
+
+        private void LerpPosition()
+        {
+            double t = (beatTime - conductor.songPosition);
+            double f = (timeShownInAdvance - t) / timeShownInAdvance; 
+
+            // If the note is between the spawn point and the reaching point
+            if (f <= 1.0d) 
+            {
+                // Lerps the note position between the two points 
+                transform.position = Vector2.Lerp (
+                    spawnAnchor.position,
+                    targetAnchor.position,
+                    (float) f
+                );
+            }
+            // If the note has gone over the reaching point, overshoots the note
+            else {
+                // Lerps the note position between the 
+                transform.position = Vector2.Lerp(
+                    targetAnchor.position,
+                    (targetAnchor.position * 2) - spawnAnchor.position,
+                    (float)f - 1
+                );
             }
         }
 
