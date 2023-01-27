@@ -1420,7 +1420,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df71b3417cfd23e40855c088f70a7e0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  beatMapData: {fileID: 11400000, guid: cf6b37840dbf4c14f91176da23cf990d, type: 2}
+  beatMapData: {fileID: 11400000, guid: f6d832c12c4e20c4a8dd58da9675f46c, type: 2}
   conductor: {fileID: 69734358}
   beatTrack: {fileID: 1617281361}
 --- !u!1 &1390396852
@@ -1715,7 +1715,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sfxPlayers:
   - tag: Hit
-    audioClip: {fileID: 8300000, guid: 51bc87ee497720641b7ae95a90a31d75, type: 3}
+    audioClip: {fileID: 8300000, guid: 95e9d2c07dd6c5f4696ea9b3a46cf37d, type: 3}
     mixerGroup: {fileID: 0}
     volume: 0.2
     pitch: 1

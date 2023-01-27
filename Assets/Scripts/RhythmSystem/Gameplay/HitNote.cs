@@ -7,7 +7,7 @@ namespace RhythmSystem
     // Notes that need to be hit rhythmically
     public class HitNote : MonoBehaviour
     {
-        const double AUTOPLAY_THRESHOLD = .01d;
+        const double AUTOPLAY_THRESHOLD = .001d;
 
         double beatTime;
         double timeShownInAdvance;
