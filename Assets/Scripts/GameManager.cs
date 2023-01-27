@@ -30,10 +30,10 @@ public class GameManager : MonoBehaviour
         AutoPlay = value;
         if (autoPlayDisplay)
         {
-            autoPlayDisplay.text = "Autoplay: ";
+            autoPlayDisplay.text = "[A] - Autoplay: ";
             autoPlayDisplay.text += AutoPlay ?
-                "<color=green>On" :
-                "<color=red>Off";
+                "<color=green>ON" :
+                "<color=red>OFF";
         }
     }
 }

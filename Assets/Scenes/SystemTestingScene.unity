@@ -170,7 +170,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   introSilenceBaseFiller: 0.2
-  playBPMTest: 1
+  playBPMTest: 0
   songState: 0
   songBpm: 0
   secPerBeat: 0
@@ -1721,9 +1721,9 @@ MonoBehaviour:
     pitch: 1
     source: {fileID: 0}
   - tag: Miss
-    audioClip: {fileID: 8300000, guid: 755f9c112fe25514a8a3d2542dcc5ecd, type: 3}
+    audioClip: {fileID: 8300000, guid: 09d643ea71ce6c140ab810b69112a588, type: 3}
     mixerGroup: {fileID: 0}
-    volume: 0
+    volume: 0.2
     pitch: 2
     source: {fileID: 0}
 --- !u!1 &1819757359

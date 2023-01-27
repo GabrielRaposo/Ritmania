@@ -138,8 +138,8 @@ namespace RhythmSystem
                     break;
 
                 case SongState.Playing:
-                    //songPosition = AudioSettings.dspTime - dspSongTime; 
-                    songPosition = musicSource.time - FirstBeatOffset;
+                    //songPosition = AudioSettings.dspTime - dspSongTime; // -- Older method: may be necessary if audioclip changes dynamicaly 
+                    songPosition = musicSource.time - FirstBeatOffset; // Newer method: seems more consistent
                     break;
 
                 case SongState.Outro:
@@ -148,7 +148,7 @@ namespace RhythmSystem
 
             songPositionInBeats = songPosition / secPerBeat;
             
-            if (playBPMTest) 
+            if (playBPMTest)
                 TestSoundBPM();
 
             // Starts playing the song at 0:00:000
