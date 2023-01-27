@@ -45,7 +45,7 @@ namespace RhythmSystem
 
         private void StartBeatMap()
         {
-            conductor.StartConduction();   
+            conductor.StartConduction();
             beatTrack.StartBeatMap();
         }
     }

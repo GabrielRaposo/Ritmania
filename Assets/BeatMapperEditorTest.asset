@@ -18,3 +18,16 @@ MonoBehaviour:
   - awnserDistance: 0
     awnserCount: 1
     awnsersSpacing: 0
+  calls:
+  - tempo: 48
+    compass: 0
+    call:
+      awnserDistance: 0
+      awnserCount: 1
+      awnsersSpacing: 0
+  - tempo: 3
+    compass: 0
+    call:
+      awnserDistance: 0
+      awnserCount: 1
+      awnsersSpacing: 0

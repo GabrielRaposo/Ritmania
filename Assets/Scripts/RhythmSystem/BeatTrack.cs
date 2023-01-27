@@ -45,10 +45,12 @@ namespace RhythmSystem
         // Translates the beatmap from beat's to second's timestamps
         public void TranslateToBeatmap()
         {
+            Debug.Log($"beatMap: (conductor.secPerBeat: {conductor.secPerBeat})");
             beatmap = new List<float>();
             for (int i = 0; i < beatmapInBeats.Count; i++) 
             {
                 beatmap.Add(beatmapInBeats[i] * conductor.secPerBeat);
+                Debug.Log($"> {i} - {beatmapInBeats[i] * conductor.secPerBeat}");
             }
         }
 

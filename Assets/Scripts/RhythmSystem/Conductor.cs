@@ -120,7 +120,7 @@ namespace RhythmSystem
             songState = SongState.Intro;
         }
 
-        private void StartMusic() 
+        public void StartMusic() 
         {
             musicSource.Play();
             dspSongTime = (float) AudioSettings.dspTime;
