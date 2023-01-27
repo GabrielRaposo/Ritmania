@@ -18,17 +18,7 @@ namespace RhythmSystem
         // Flag for the state of the conductor.
         public SongState songState;
 
-        // Current BPM in use. This should be able to change dynamicaly during gameplay.
         public float songBpm;
-
-        // Some songs don't start on the first second of the file, 
-        // so we need to be able to cut-off the silence to start the beat at the right time.
-        public double firstBeatOffset;
-
-        // This variable defines how much earlier you need to spawn a hit-note before it reaches it's hit-time.
-        public float beatsShownInAdvance;
-
-        // Time between beats. This is necessary to translate beat-based timestamps to time-based ones.
         public double secPerBeat;
 
         // The timestamp of when the music started playing according to the Audio System timer.
@@ -43,16 +33,22 @@ namespace RhythmSystem
         // Source of the song data
         BeatMapData beatMapData;
 
+        // Some songs don't start at 0:00:000 so we need to offset the start to set the beat to the right time.
+        public double FirstBeatOffset => beatMapData ? beatMapData.FirstBeatOffset : 0;
+
+        // How much earlier you need to spawn a hit-note before it reaches it's hit-time.
+        public float BeatsShownInAdvance => beatMapData ? beatMapData.BeatsShownInAdvance : 0;
+
         // How "far" the note can move away from it's hit-spot before it's considered a "miss".
         public float MissThreshold => beatMapData ? beatMapData.MissThreshold : 0;
         
         // The "beatsShownInAdvance" as seconds-based value.
-        public double TimeShownInAdvance => beatsShownInAdvance * secPerBeat;
+        public double TimeShownInAdvance => BeatsShownInAdvance * secPerBeat;
 
         // The beatmap timer has negative value during the intro silence, 
         // so the music should start playing at 0:00:000.
         // "firstBeatOffset" is used to "shift" the start of the song.
-        public bool HasExitedTheIntro => songPosition + firstBeatOffset >= 0;
+        public bool HasExitedTheIntro => songPosition + FirstBeatOffset >= 0;
 
         // Retorna um tempo de base pré-definido + o tempo mínimo para que uma nota seja gerada e faça o caminho até o ponto de chegada
         private double IntroDuration 
@@ -62,7 +58,7 @@ namespace RhythmSystem
                 if (songBpm <= 0)
                     return introSilenceBaseFiller;
                 else 
-                    return introSilenceBaseFiller + (beatsShownInAdvance * secPerBeat);
+                    return introSilenceBaseFiller + (BeatsShownInAdvance * secPerBeat);
             }
         }
 
@@ -103,9 +99,6 @@ namespace RhythmSystem
 
                 songBpm = beatMapData.BPM; 
                 secPerBeat = 60d / songBpm;
-            
-                firstBeatOffset = beatMapData.FirstBeatOffset;
-                beatsShownInAdvance = beatMapData.BeatsShownInAdvance;
             }
         }
 
@@ -144,7 +137,7 @@ namespace RhythmSystem
 
                 case SongState.Playing:
                     //songPosition = AudioSettings.dspTime - dspSongTime; 
-                    songPosition = musicSource.time - firstBeatOffset;
+                    songPosition = musicSource.time - FirstBeatOffset;
                     break;
 
                 case SongState.Outro:

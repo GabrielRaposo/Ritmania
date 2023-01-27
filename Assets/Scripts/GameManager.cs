@@ -2,29 +2,38 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    public TextMeshProUGUI autoPlayDisplay;
+
     public static bool AutoPlay;
 
     void Start()
     {
         Application.targetFrameRate = 60;
-        AutoPlay = false;
+        SetAutoPlay(false);
     }
 
     private void Update() 
     {
-        // Toggle de Auto-play
         if (Input.GetKeyDown(KeyCode.A))
-        {
-            AutoPlay = !AutoPlay;
-        }
+            SetAutoPlay(!AutoPlay);
 
-        // Reset da cena
         if (Input.GetKeyDown(KeyCode.R))
-        {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void SetAutoPlay(bool value)
+    {
+        AutoPlay = value;
+        if (autoPlayDisplay)
+        {
+            autoPlayDisplay.text = "Autoplay: ";
+            autoPlayDisplay.text += AutoPlay ?
+                "<color=green>On" :
+                "<color=red>Off";
         }
     }
 }

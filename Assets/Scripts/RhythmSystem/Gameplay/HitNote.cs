@@ -7,7 +7,7 @@ namespace RhythmSystem
     // Classe para as notas que devem ser acertadas dentro do ritmo
     public class HitNote : MonoBehaviour
     {
-        const double AUTOPLAY_THRESHOLD = .0d;
+        const double AUTOPLAY_THRESHOLD = .01d;
         double beatTime;
         double timeShownInAdvance;
 
