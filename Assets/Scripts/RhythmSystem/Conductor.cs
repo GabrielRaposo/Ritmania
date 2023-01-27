@@ -115,6 +115,7 @@ namespace RhythmSystem
         {
             // Saves the current timestamp so it can be used as an offset to the song time calculation.
             dspSongTime = AudioSettings.dspTime;
+            songPosition = -999f;
 
             // Notify that the conductor is running, but the song is not playing yet.
             songState = SongState.Intro;
@@ -142,12 +143,11 @@ namespace RhythmSystem
                     break;
 
                 case SongState.Playing:
-                    songPosition = AudioSettings.dspTime - dspSongTime; 
-                    //songPosition = musicSource.time - firstBeatOffset;
+                    //songPosition = AudioSettings.dspTime - dspSongTime; 
+                    songPosition = musicSource.time - firstBeatOffset;
                     break;
 
                 case SongState.Outro:
-                    // -- TO-DO
                     break;
             }
 

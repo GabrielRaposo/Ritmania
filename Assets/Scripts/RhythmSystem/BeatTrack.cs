@@ -35,7 +35,7 @@ namespace RhythmSystem
             // -- Temp: BeatMap as Beats
             //beatmapInBeats = new List<float>() { 0, 1, 1.5f, 2, 4, 5, 6, 8, 9, 10 };
             beatmapInBeats = new List<float>();
-            for (int i = 0; i < 30; i++) beatmapInBeats.Add(i);
+            for (int i = 0; i < 100; i++) beatmapInBeats.Add(i);
 
             TranslateToBeatmap();
 
@@ -45,18 +45,14 @@ namespace RhythmSystem
         // Translates the beatmap from beat's to second's timestamps
         public void TranslateToBeatmap()
         {
-            Debug.Log($"beatMap: (conductor.secPerBeat: {conductor.secPerBeat})");
             beatmap = new List<double>();
             for (int i = 0; i < beatmapInBeats.Count; i++) 
-            {
                 beatmap.Add(beatmapInBeats[i] * conductor.secPerBeat);
-                Debug.Log($"> {i} - {beatmapInBeats[i] * conductor.secPerBeat}");
-            }
         }
 
         public void StartBeatMap()
         {
-            // Activates the gameplay controls
+            // Activates the gameplay interaction
             if (rhythmJudge)
                 rhythmJudge.Setup(conductor, this);
 

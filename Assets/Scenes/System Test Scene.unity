@@ -169,7 +169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5e15f75968522d4dba4534ee829383e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  introSilenceBaseFiller: 0
+  introSilenceBaseFiller: 0.1
   songState: 0
   songBpm: 0
   firstBeatOffset: 0

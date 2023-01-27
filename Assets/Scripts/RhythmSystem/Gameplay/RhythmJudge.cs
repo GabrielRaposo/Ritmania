@@ -52,10 +52,10 @@ namespace RhythmSystem
 
             // Lê input e tenta acertar nota
             if (Input.GetKeyDown(KeyCode.Space)) 
-                HitNote(conductor.songPosition);
+                TryToHitNote(conductor.songPosition);
         }
 
-        private void HitNote(double hitTime)
+        private void TryToHitNote(double hitTime)
         {
             double difference = focusedNote.BeatTime - hitTime;
             //Debug.Log($"hit time: {hitTime}, difference: {difference}" );
