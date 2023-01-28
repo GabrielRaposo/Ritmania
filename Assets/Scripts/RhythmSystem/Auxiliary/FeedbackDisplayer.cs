@@ -21,7 +21,7 @@ public class FeedbackDisplayer : MonoBehaviour
         pool = GetComponentInChildren<ObjectPool>();
     }
 
-    public void CallFeedback(PrecisionScore precisionScore)
+    public void CallFeedback(PrecisionScore precisionScore, double offset)
     {
         if (!pool)
             return;
@@ -31,6 +31,6 @@ public class FeedbackDisplayer : MonoBehaviour
         if (!feedbackEffect)
             return;
 
-        feedbackEffect.Setup(precisionScore, transform.position);
+        feedbackEffect.Setup(precisionScore, offset, transform.position);
     }
 }

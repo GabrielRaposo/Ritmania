@@ -9,11 +9,14 @@ namespace RhythmSystem
 
     public class RhythmJudge : MonoBehaviour
     {
+        // These values are tested for both early and late hits, 
+        // so a 0.05 sec threshold is effectively a 0.10 sec leniency range
         const float PERFECT_THRESHOLD = .05f;
         const float GOOD_THRESHOLD    = .10f;
         const float BAD_THRESHOLD     = .15f;
 
-        const float RANGE_RADIUS = .5f; // Distância mínima para que a nota seja interagível
+        // Minimum distance for a note to be interactable
+        const float RANGE_RADIUS = .3f; 
 
         public Transform cursor;
 
@@ -23,7 +26,6 @@ namespace RhythmSystem
         bool isPlaying;
         HitNote focusedNote;
 
-        // Recebe valores de inicialização do BeatTrack
         public void Setup (Conductor conductor, BeatTrack beatTrack) 
         {
             this.conductor = conductor;
@@ -31,15 +33,14 @@ namespace RhythmSystem
             isPlaying = true;
         }
 
-        void Update()
+        void LateUpdate()
         {
             if (!isPlaying)
                 return;
 
-            // Atualiza a nota de foco
             focusedNote = beatTrack.GetActiveHitNote();
 
-            // Se não existe nota para se focar, some com o cursor
+            // If there's no note to focus on, hides the cursor off-screen
             if (focusedNote == null)
             {
                 if (cursor)
@@ -47,21 +48,24 @@ namespace RhythmSystem
                 return;
             }
 
-            // Faz cursor acompanhar posição da nota em foco
-            if (cursor)
-            {
-                cursor.position = focusedNote.transform.position;
-                cursor.localScale = Vector2.one * (Mathf.Abs((float)(focusedNote.BeatTime - conductor.songPosition)) < RANGE_RADIUS ? 1 : .8f);
-            }
+            SetCursorToFocusedNote();
 
-            // Lê input e tenta acertar nota
             if (Input.GetKeyDown(KeyCode.Space)) 
                 TryToHitNote(conductor.songPosition);
         }
 
+        private void SetCursorToFocusedNote()
+        {
+            if (!cursor)
+                return;
+            
+            cursor.position = focusedNote.transform.position;
+            cursor.localScale = Vector2.one * (Mathf.Abs((float)(focusedNote.BeatTime - conductor.songPosition)) < RANGE_RADIUS ? 1 : .8f);
+        }
+
         private void TryToHitNote(double hitTime)
         {
-            double difference = focusedNote.BeatTime - hitTime;
+            double difference = hitTime - focusedNote.BeatTime;
             float absDifference = Mathf.Abs((float)difference);
 
             // If the note is way too far, don't even try to hit it
@@ -70,23 +74,23 @@ namespace RhythmSystem
 
             if (absDifference < PERFECT_THRESHOLD)
             {
-                focusedNote.OnHit(PrecisionScore.Perfect);
+                focusedNote.OnHit(PrecisionScore.Perfect, difference);
                 return;
             }
 
             if (absDifference < GOOD_THRESHOLD)
             {
-                focusedNote.OnHit(PrecisionScore.Good);
+                focusedNote.OnHit(PrecisionScore.Good, difference);
                 return;
             }
 
             if (absDifference < BAD_THRESHOLD)
             {
-                focusedNote.OnHit(PrecisionScore.Bad);
+                focusedNote.OnHit(PrecisionScore.Bad, difference);
                 return;
             }
             
-            focusedNote.OnHit(PrecisionScore.Miss);
+            focusedNote.OnHit(PrecisionScore.Miss, difference);
         }
     }
 }

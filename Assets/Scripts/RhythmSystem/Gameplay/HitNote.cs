@@ -54,7 +54,7 @@ namespace RhythmSystem
                 {
                     transform.position = targetAnchor.position;
                     Debug.Log($"Offset: { hitOffset.ToString("0.0000") }");
-                    OnHit(PrecisionScore.Perfect);
+                    OnHit(PrecisionScore.Perfect, hitOffset);
                 }
                 return;
             }
@@ -62,7 +62,7 @@ namespace RhythmSystem
             // If AutoPlay is off, verify if the note has crossed the MissThreshold
             if (conductor.songPosition > beatTime + conductor.MissThreshold)
             {
-                OnHit(PrecisionScore.Miss);
+                OnHit(PrecisionScore.Miss, conductor.songPosition - beatTime);
                 return;
             }
         }
@@ -84,8 +84,8 @@ namespace RhythmSystem
             }
             // If the note has gone over the reaching point, overshoots the note
             else {
-                // Lerps the note position between the 
-                transform.position = Vector2.Lerp(
+                // Lerps the note position between the reaching point and its extension based on the spawn point 
+                transform.position = Vector2.Lerp (
                     targetAnchor.position,
                     (targetAnchor.position * 2) - spawnAnchor.position,
                     (float)f - 1
@@ -93,7 +93,7 @@ namespace RhythmSystem
             }
         }
 
-        public void OnHit (PrecisionScore score)
+        public void OnHit (PrecisionScore score, double offset)
         {
             switch(score) 
             {
@@ -103,11 +103,11 @@ namespace RhythmSystem
                     break;
 
                 case PrecisionScore.Miss:
-                    SFXController.Instance.PlaySound("Miss");
+                    SFXController.Instance.PlaySound("Error");
                     break;
             }
 
-            FeedbackDisplayer.Instance.CallFeedback(score);
+            FeedbackDisplayer.Instance.CallFeedback(score, offset);
 
             if (beatTrack)
                 beatTrack.OnNoteDeactivation(this);

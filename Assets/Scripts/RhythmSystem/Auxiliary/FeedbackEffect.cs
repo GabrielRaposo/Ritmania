@@ -13,7 +13,7 @@ public class FeedbackEffect : MonoBehaviour
     Vector2 spawnPoint;
     TextMeshPro display;
 
-    public void Setup (PrecisionScore precisionScore, Vector2 spawnPoint)
+    public void Setup (PrecisionScore precisionScore, double offset, Vector2 spawnPoint)
     {
         display = GetComponent<TextMeshPro>();
         if (!display)
@@ -42,6 +42,9 @@ public class FeedbackEffect : MonoBehaviour
                 break;
 
         }
+
+        display.text += offset >= 0 ? "\n+" : "\n";
+        display.text += offset.ToString("0.00");
 
         this.spawnPoint = spawnPoint;
         transform.position = spawnPoint;
