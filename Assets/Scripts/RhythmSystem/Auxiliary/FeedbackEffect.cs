@@ -24,13 +24,23 @@ public class FeedbackEffect : MonoBehaviour
 
         switch (precisionScore) 
         {
+            default:
+            case PrecisionScore.Perfect:
+                display.text = "<color=yellow>Perfect";
+                break;
+
+            case PrecisionScore.Good:
+                display.text = "<color=blue>Good";
+                break;
+
+            case PrecisionScore.Bad:
+                display.text = "<color=grey>Bad";
+                break;
+
             case PrecisionScore.Miss:
                 display.text = "<color=red>Miss";
                 break;
 
-            default:
-                display.text = "<color=yellow>Hit";
-                break;
         }
 
         this.spawnPoint = spawnPoint;

@@ -9,6 +9,10 @@ namespace RhythmSystem
 
     public class RhythmJudge : MonoBehaviour
     {
+        const float PERFECT_THRESHOLD = .05f;
+        const float GOOD_THRESHOLD    = .10f;
+        const float BAD_THRESHOLD     = .15f;
+
         const float RANGE_RADIUS = .5f; // Distância mínima para que a nota seja interagível
 
         public Transform cursor;
@@ -58,21 +62,31 @@ namespace RhythmSystem
         private void TryToHitNote(double hitTime)
         {
             double difference = focusedNote.BeatTime - hitTime;
-            //Debug.Log($"hit time: {hitTime}, difference: {difference}" );
+            float absDifference = Mathf.Abs((float)difference);
 
-            // Se a nota estiver muito longe ainda, nem tenta apertar
-            if (Mathf.Abs((float)difference) > RANGE_RADIUS) 
+            // If the note is way too far, don't even try to hit it
+            if (absDifference > RANGE_RADIUS) 
                 return;
 
-            if (Mathf.Abs((float)difference) < .15f)
+            if (absDifference < PERFECT_THRESHOLD)
             {
-                focusedNote.OnHit();
+                focusedNote.OnHit(PrecisionScore.Perfect);
+                return;
+            }
 
-            }
-            else 
+            if (absDifference < GOOD_THRESHOLD)
             {
-                focusedNote.OnMiss();
+                focusedNote.OnHit(PrecisionScore.Good);
+                return;
             }
+
+            if (absDifference < BAD_THRESHOLD)
+            {
+                focusedNote.OnHit(PrecisionScore.Bad);
+                return;
+            }
+            
+            focusedNote.OnHit(PrecisionScore.Miss);
         }
     }
 }

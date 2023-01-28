@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Music: {fileID: 8300000, guid: b399cf8c18bac9c47a6ca81b263d87ff, type: 3}
   BPM: 60
-  BeatsShownInAdvance: 2
+  BeatsShownInAdvance: 3
   FirstBeatOffset: 0
   MissThreshold: 0.5

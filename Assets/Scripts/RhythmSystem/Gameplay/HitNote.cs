@@ -54,7 +54,7 @@ namespace RhythmSystem
                 {
                     transform.position = targetAnchor.position;
                     Debug.Log($"Offset: { hitOffset.ToString("0.0000") }");
-                    OnHit();
+                    OnHit(PrecisionScore.Perfect);
                 }
                 return;
             }
@@ -62,7 +62,7 @@ namespace RhythmSystem
             // If AutoPlay is off, verify if the note has crossed the MissThreshold
             if (conductor.songPosition > beatTime + conductor.MissThreshold)
             {
-                OnMiss();
+                OnHit(PrecisionScore.Miss);
                 return;
             }
         }
@@ -93,21 +93,22 @@ namespace RhythmSystem
             }
         }
 
-        public void OnHit()
+        public void OnHit (PrecisionScore score)
         {
-            SFXController.Instance.PlaySound("Hit");
-            FeedbackDisplayer.Instance.CallFeedback(PrecisionScore.Perfect);
+            switch(score) 
+            {
+                default:
+                case PrecisionScore.Perfect:
+                    SFXController.Instance.PlaySound("Hit");
+                    break;
 
-            if (beatTrack)
-                beatTrack.OnNoteDeactivation(this);
-            gameObject.SetActive(false); 
-        }
+                case PrecisionScore.Miss:
+                    SFXController.Instance.PlaySound("Miss");
+                    break;
+            }
 
-        public void OnMiss()
-        {
-            SFXController.Instance.PlaySound("Miss");
-            FeedbackDisplayer.Instance.CallFeedback(PrecisionScore.Miss);
-            
+            FeedbackDisplayer.Instance.CallFeedback(score);
+
             if (beatTrack)
                 beatTrack.OnNoteDeactivation(this);
             gameObject.SetActive(false); 
