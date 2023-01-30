@@ -139,7 +139,7 @@ namespace RhythmSystem
 
                 case SongState.Playing:
                     //songPosition = AudioSettings.dspTime - dspSongTime; // -- Older method: may be necessary if audioclip changes dynamicaly 
-                    songPosition = musicSource.time - FirstBeatOffset; // Newer method: seems more consistent
+                    songPosition = musicSource.time - FirstBeatOffset;    // -- Newer method: seems more consistent
                     break;
 
                 case SongState.Outro:

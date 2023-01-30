@@ -15,18 +15,18 @@ namespace RhythmSystem
         public Transform spawnAnchor;
         public Transform targetAnchor;
 
-        int nextIndex;        // Last HitNote that's been spawned. 
+        int nextIndex;        // the index of the last HitNote that's been spawned 
         bool beatmapIsReady;  // Is set to true when the list of hitnotes is prepared
 
         // -- Beatmap
-        List<float> beatmapInBeats; // Lista com formato acessível para ser escrito
-        List<double> beatmap;        // Beatmap de fato, com precisão de tempo em segundos
-        List<HitNote> activeNotes;  // Enfilera as notas em tela em ordem de chegada
+        List<float> beatmapInBeats;  
+        List<double> beatmap;        
+        List<HitNote> activeNotes;   // Queue of the active hit notes that are on screen
 
         Conductor conductor; 
 
         // This class should be always set-up by the BeatMapCaller.
-        public void Setup (Conductor conductor) // -- TO-DO: receive beatmap data as well
+        public void Setup (Conductor conductor)
         {
             this.conductor = conductor;
 
@@ -73,6 +73,7 @@ namespace RhythmSystem
             double timeShownInAdvance = conductor.TimeShownInAdvance;
 
             // If it's X-seconds before the time for the note to be hit, spawn it
+            // X = timeShownInAdvance
             if (conductor.songPosition + timeShownInAdvance > currentNoteTime)
             {
                 SpawnHitNote (currentNoteTime, timeShownInAdvance);
