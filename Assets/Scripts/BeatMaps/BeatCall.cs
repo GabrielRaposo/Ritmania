@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 public class BeatCall
 {
     public string name;
-    private string code;
+    [SerializeField]private string code;
     public string Code
     {
         get

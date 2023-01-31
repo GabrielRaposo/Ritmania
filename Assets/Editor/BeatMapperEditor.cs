@@ -252,6 +252,9 @@ public class BeatMapperEditor : Editor
             }
         
         }
+        
+        EditorUtility.SetDirty(obj);
+        
     }
 
     private void AddCallsButtons(BeatMapper obj)
@@ -511,7 +514,12 @@ public class BeatMapperEditor : Editor
             
             for (int i = 0; i < call.answerCount; i++)
             {
-                int responseX = x + beatLenghtInPixels * call.answersSpacing * i + beatLenghtInPixels*call.answerDistance;
+                //int responseX = x + beatLenghtInPixels * call.answersSpacing * i + beatLenghtInPixels*call.answerDistance;
+                int responseX = Mathf.RoundToInt
+                (
+                    (c.tempo + (c.compass + call.answerDistance + (call.answersSpacing * i)) * 0.25f) * obj.BeatLenght /
+                    mainAudio.clip.length * lenght
+                ) - 4;
                 combinedArrowsTexture.OverlayTexture(responseX,0,downArrow0);
             }
             
