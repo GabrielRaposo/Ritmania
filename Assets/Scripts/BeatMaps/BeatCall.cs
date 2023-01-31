@@ -8,8 +8,17 @@ using UnityEngine.Serialization;
 public class BeatCall
 {
     public string name;
-    public string code;
-    
+    private string code;
+    public string Code
+    {
+        get
+        {
+            if(code == "")
+                Init();
+            return code;
+        }
+        set => code = value;
+    }
     [FormerlySerializedAs("awnserDistance")] public int answerDistance;
     
     [FormerlySerializedAs("awnserCount")] public  int answerCount;
@@ -25,7 +34,13 @@ public class BeatCall
         editorColor = Color.red;
         name = "Beat Call";
 
+        //code = Random.Range(0, 1728).ToString("X");
+    }
+
+    public void Init()
+    {
         code = Random.Range(0, 1728).ToString("X");
     }
+    
     
 }
