@@ -452,9 +452,9 @@ public class BeatMapperEditor : Editor
             int x = Mathf.RoundToInt(((i * (obj.BeatLenght/4f) / mainAudio.clip.length)*lenght));
             
             if(i%4==0)
-                middleLineTexture.PaintColorBlock(1, halfH, dividerColor, x, quarterH);
+                middleLineTexture.PaintColorBlock(1, height, dividerColor, x, 0);
             else
-                middleLineTexture.PaintColorBlock(1, quarterH, dividerColor*new Color(0.7f,0.7f,0.7f), x, quarterH+octH);
+                middleLineTexture.PaintColorBlock(1, halfH, dividerColor*new Color(0.7f,0.7f,0.7f), x, quarterH);
         }
         
         return middleLineTexture;

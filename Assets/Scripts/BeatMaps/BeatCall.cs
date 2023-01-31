@@ -19,10 +19,9 @@ public class BeatCall
         }
         set => code = value;
     }
-    [FormerlySerializedAs("awnserDistance")] public int answerDistance;
-    
-    [FormerlySerializedAs("awnserCount")] public  int answerCount;
-    [FormerlySerializedAs("awnsersSpacing")] public  int answersSpacing;
+    public int answerDistance;
+    public  int answerCount;
+    public  int answersSpacing;
 
     public Color editorColor;
 
