@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Plastic.Newtonsoft.Json.Serialization;
 using UnityEngine;
 using UnityEditor;
 
@@ -120,6 +121,37 @@ public static class MyEditorTools
 
 		return value;
 	}
+
+	public static T CompactedObjectField<T>(string label, T value, GUILayoutOption[] labelOptions = null, GUILayoutOption[] fieldOptions = null) where T : Object
+	{
+		GUILayout.BeginHorizontal();
+		
+		GUILayout.Label(label, labelOptions);
+
+		value = (T)EditorGUILayout.ObjectField(value, typeof(T), false, fieldOptions);
+
+		GUILayout.EndHorizontal();
+
+		return value;
+	}
+	
+	public static T WatcherObjectField<T>(string label, T value, Action action, GUILayoutOption[] labelOptions = null, GUILayoutOption[] fieldOptions = null) where T : Object
+	{
+		var initValue = value;
+		
+		GUILayout.BeginHorizontal();
+		
+		GUILayout.Label(label, labelOptions);
+
+		value = (T)EditorGUILayout.ObjectField(value, typeof(T), false, fieldOptions);
+
+		GUILayout.EndHorizontal();
+		
+		if(initValue!=value)
+			action?.Invoke();
+
+		return value;
+	} 
 
 	public static string AlignLeftStringField(string label, string value)
 	{

@@ -12,9 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66ae43ae8cb5c394c92b960ef9e82b3a, type: 3}
   m_Name: BeatMapperEditorTest
   m_EditorClassIdentifier: 
-  clip: {fileID: 8300000, guid: 31d1353218aab8e429a12a7f90c426e6, type: 3}
-  bpm: 75
+  clip: {fileID: 8300000, guid: 65b3a218f50cf2d4a947e1250c678a5c, type: 3}
+  bpm: 50
   callTypes:
-  - awnserDistance: 0
-    awnserCount: 1
-    awnsersSpacing: 0
+  - name: Beat Call
+    code: D3
+    answerDistance: 3
+    answerCount: 1
+    answersSpacing: 1
+    editorColor: {r: 1, g: 0, b: 0, a: 1}
+    callClip: {fileID: 8300000, guid: cebb22b1b4253fa408a2a295efdd3fea, type: 3}
+    answerClip: {fileID: 8300000, guid: 94f4927624a7fcf48b4df6ba7a163856, type: 3}
+  - name: Beat Call
+    code: 4A5
+    answerDistance: 3
+    answerCount: 2
+    answersSpacing: 1
+    editorColor: {r: 0.9811321, g: 0.8000669, b: 0.0046279924, a: 1}
+    callClip: {fileID: 8300000, guid: 367b88f7c7f70554e83fdd01247c317d, type: 3}
+    answerClip: {fileID: 8300000, guid: 94f4927624a7fcf48b4df6ba7a163856, type: 3}
+  timedCalls:
+  - tempo: 0
+    compass: 876
+    code: D3
+  - tempo: 2
+    compass: 2037
+    code: 4A5

@@ -34,6 +34,8 @@ public class BeatMapperEditor : Editor
     private int beatTempo;
     private int beatCompass;
 
+    private BeatTiming currentBeatCall;
+
     public override bool RequiresConstantRepaint() => true;
 
     private float AudioLerp()
@@ -63,6 +65,8 @@ public class BeatMapperEditor : Editor
         GUILayout.Space(8);
         
         BeatMapper obj = (BeatMapper)target;
+        
+        EditorSound.SetMapper(obj);
 
         GUILayout.BeginHorizontal(); //E
         
@@ -75,9 +79,12 @@ public class BeatMapperEditor : Editor
         
         GUILayout.EndHorizontal(); //0E
 
-        mainAudio = EditorSound.mainAudioController._AudioSource;
-        beepAudio = EditorSound.beepController._AudioSource;
+        mainAudio = EditorSound.GetMainSoundSource();
+        beepAudio = EditorSound.GetBeepSource();
 
+        if(mainAudio== null)
+            return;
+        
         if (mainAudio.clip != obj.clip)
             mainAudio.clip = obj.clip;
 
@@ -86,6 +93,7 @@ public class BeatMapperEditor : Editor
             OnChangeClip(obj);
 
 
+        //Sound calls
         var time = mainAudio.time;
 
         if (mainAudio.isPlaying)
@@ -94,20 +102,78 @@ public class BeatMapperEditor : Editor
             {
                 if(beepAudio!=null)
                     beepAudio.Play();
-                //Debug.Log($"BEAT:({time}) [{beatTempo+1}]");
             }
-                
+            
+            int nextC = beatCompass+1;
+            int nextT = beatTempo;
+
+            if (nextC == 4)
+            {
+                nextT++;
+                nextC = 0;
+            }
+            
+            BeatTiming beat = obj.timedCalls.Find(a => a.compass == nextC && a.tempo == nextT);
+
+            if (beat != null)
+            {
+                if (time > (nextT * obj.BeatLenght) + (nextC * obj.BeatLenght * 0.25f))
+                {
+                    var sound = EditorSound.GetAudioSource(obj.GetCallFromCode(beat.code).callClip);
+                    if(sound!=null)
+                        sound.Play();
+                }
+            }
+
+            // List<BeatTiming> answers = obj.timedCalls.FindAll(bt =>
+            // {
+            //     var call = obj.GetCallFromCode(bt.code);
+            //
+            //     if (call.answerCount <= 0) return false;
+            //
+            //     for (int i = 0; i < call.answerCount; i++)
+            //     {
+            //         int t = bt.tempo;
+            //         int c = bt.compass += call.answerDistance + call.answersSpacing * i;
+            //
+            //         if (c >= 4)
+            //         {
+            //             t += Mathf.FloorToInt(c / 4f);
+            //             c = c % 4;
+            //         }
+            //
+            //         if (time > (t * obj.BeatLenght) + (c * obj.BeatLenght * 0.25f))
+            //             return true;
+            //     }
+            //
+            //     return false;
+            //
+            // });
+
+            // foreach (BeatTiming answer in answers)
+            // {
+            //     var sound = EditorSound.GetAudioSource(obj.GetCallFromCode(answer.code).answerClip);
+            //     if(sound!=null)
+            //         sound.Play();
+            // }
+            
         }
         
         beatTempo = Mathf.FloorToInt(previousTime / obj.BeatLenght);
         beatCompass = Mathf.FloorToInt((time - (beatTempo * obj.BeatLenght)) / (obj.BeatLenght / 4f));
         previousTime = time;
         
+        currentBeatCall = obj.timedCalls.Find(
+            (BeatTiming a) =>
+            {
+                return a.compass == beatCompass && a.tempo == beatTempo;
+            });
+        
         BeatCallsEditor(obj);
         
         GUILayout.Space(5);
         
-        ///PLAY Controller
+        //PLAY Controller
         GUILayout.BeginHorizontal(GUILayout.MaxWidth(55));//A
         if (GUILayout.Button(Resources.Load<Texture2D>("Editor/play")))
             mainAudio.Play();
@@ -123,7 +189,6 @@ public class BeatMapperEditor : Editor
         GUILayout.EndHorizontal(); //A0
 
         //Time line
-        
         int timelineH = 65;
         int timelineW = Mathf.CeilToInt(mainAudio.clip.length * pixelsPerSecond);
 
@@ -150,25 +215,18 @@ public class BeatMapperEditor : Editor
         
         var pointRect = new Rect( new Vector2(dotLerp, scrollBarRect.y), new Vector2(12, 12));
         
-        GUI.DrawTexture(pointRect, Resources.Load<Texture2D>("Editor/dot"));
+        GUI.DrawTexture(pointRect, Resources.Load<Texture2D>("Editor/reddot"));
 
-        GUILayout.Label($"{time.ToTimeDisplay()}");
-        //GUILayout.Label($"({beatTempo}/{beatCompass}) {time.ToTimeDisplay()}");
+        GUILayout.Label($"({beatTempo}/{beatCompass}) {time.ToTimeDisplay()}");
         
         //Calls Buttons
-        GUILayout.BeginHorizontal(); //B
-        for (int i = 0; i < obj.callTypes.Count; i++)
+        if (!mainAudio.isPlaying)
         {
-            int index = i;
-
-            var button = GUILayout.Button($"{obj.callTypes[index].name}", GUILayout.Width(95), GUILayout.Height(27));
-            if (button)
-            {
-                obj.calls.Add(new BeatTiming(beatTempo, beatCompass, obj.callTypes[index]));
-                RedrawArrows();
-            }
+            GUILayout.BeginHorizontal(); //B
+            AddCallsButtons(obj);
+            GUILayout.EndHorizontal(); //B0    
         }
-        GUILayout.EndHorizontal(); //B0
+        
         
         //Controles
         
@@ -197,6 +255,32 @@ public class BeatMapperEditor : Editor
         }
     }
 
+    private void AddCallsButtons(BeatMapper obj)
+    {
+        if (currentBeatCall != null)
+        {
+            if (GUILayout.Button("X", GUILayout.Width(27), GUILayout.Height(27)))
+            {
+                obj.timedCalls.Remove(currentBeatCall);
+                RedrawArrows();
+            }
+            return;
+        }
+        
+        
+        for (int i = 0; i < obj.callTypes.Count; i++)
+        {
+            int index = i;
+
+            var button = GUILayout.Button($"{obj.callTypes[index].name}", GUILayout.Width(95), GUILayout.Height(27));
+            if (button)
+            {
+                obj.timedCalls.Add(new BeatTiming(beatTempo, beatCompass, obj.callTypes[index].code));
+                RedrawArrows();
+            }
+        }
+    }
+
     private void ResetTextures()
     {
         waveFormTexture = null;
@@ -212,9 +296,11 @@ public class BeatMapperEditor : Editor
         if (obj.callTypes == null)
             obj.callTypes = new List<BeatCall>();
 
-        if (obj.calls == null)
-            obj.calls = new List<BeatTiming>();
+        if (obj.timedCalls == null)
+            obj.timedCalls = new List<BeatTiming>();
 
+        int callToDelete = -1;
+        
         GUILayout.BeginHorizontal(); //A
         
         for (int i = 0; i < obj.callTypes.Count; i++)
@@ -226,19 +312,35 @@ public class BeatMapperEditor : Editor
             GUILayout.BeginHorizontal(); //C
             GUILayout.Label($"{i}:", GUILayout.Width(25));
             GUILayout.FlexibleSpace();
-            call.name = GUILayout.TextField(call.name,GUILayout.Width(100));
+            call.name = GUILayout.TextField(call.name,GUILayout.Width(140));
+
+            if (GUILayout.Button("X", GUILayout.Width(18)))
+                callToDelete = i;
+            
             GUILayout.EndHorizontal(); //C0
 
-            call.awnserCount = MyEditorTools.CompactedIntField("Count", call.awnserCount, fieldOptions:new[] { GUILayout.Width(40) });
-            call.awnserDistance = MyEditorTools.CompactedIntField("Distance", call.awnserDistance, fieldOptions:new[] { GUILayout.Width(40) });
-            call.awnsersSpacing = MyEditorTools.CompactedIntField("Spacing", call.awnsersSpacing, fieldOptions:new []{GUILayout.Width(40)});
+            call.answerCount = MyEditorTools.CompactedIntField("Count", call.answerCount, fieldOptions:new[] { GUILayout.Width(40) });
+            call.answerDistance = MyEditorTools.CompactedIntField("Distance", call.answerDistance, fieldOptions:new[] { GUILayout.Width(40) });
+            call.answersSpacing = MyEditorTools.CompactedIntField("Spacing", call.answersSpacing, fieldOptions:new []{GUILayout.Width(40)});
+
+            GUILayout.Space(8);
+
+            call.callClip = MyEditorTools.CompactedObjectField("Call", call.callClip, fieldOptions: new[] { GUILayout.Width(150) });
+            call.answerClip = MyEditorTools.CompactedObjectField("Answer", call.answerClip, fieldOptions: new[] { GUILayout.Width(150) });
 
             call.editorColor = EditorGUILayout.ColorField(call.editorColor);
-
             call.editorColor = new Color(call.editorColor.r, call.editorColor.g, call.editorColor.b, 1f);
 
             GUILayout.EndVertical(); //B0
+            
+            EditorSound.UpdateMapper(obj);
         }
+
+        if (callToDelete > -1)
+        {
+            RemoveCallType(obj, callToDelete);
+        }
+            
         
         if(GUILayout.Button("Add +"))
             obj.callTypes.Add(new BeatCall());
@@ -276,6 +378,16 @@ public class BeatMapperEditor : Editor
         GUI.DrawTexture(r, dividerTex, ScaleMode.ScaleAndCrop, true);
         GUI.DrawTexture(r, arrowsTex, ScaleMode.ScaleAndCrop, true);
 
+        //TODO desalinho de 1 pixel
+        float floatX = ((beatTempo + beatCompass * 0.25f) * beatMapper.BeatLenght) / beatMapper.clip.length * width;
+        
+        int x = Mathf.CeilToInt(floatX)-7;
+
+        var dot = TextureDrawingUtil.GetNewTintedTexture(Resources.Load<Texture2D>("Editor/dot"), Color.cyan);
+        
+        Rect tempoMarkerRect = new Rect(x, halfHeight - 7, 13, 13);
+        GUI.DrawTexture(tempoMarkerRect, dot);
+        
         //BPM division
         int markerHight = height;
         var markerTex = new Texture2D(markerLineSize, markerHight, TextureFormat.RGBA32, false);
@@ -334,7 +446,7 @@ public class BeatMapperEditor : Editor
         float nOfBeats = (mainAudio.clip.length / 60f) * obj.bpm*4;
         //int beatSize = Mathf.FloorToInt(lenght / nOfBeats);
         
-        //int x = Mathf.RoundToInt((call.tempo * beatMapper.BeatLenght / mainAudio.clip.length)*lenght) - 4;
+        //int x = Mathf.RoundToInt((call.tempo * obj.BeatLenght / mainAudio.clip.length)*lenght) - 4;
         
         for (int i = 1; i < nOfBeats; i++)
         {
@@ -354,7 +466,7 @@ public class BeatMapperEditor : Editor
         combinedArrowsTexture = null;
     }
     
-    private Texture2D GetArrowsTexture(int lenght, int height, BeatMapper beatMapper)
+    private Texture2D GetArrowsTexture(int lenght, int height, BeatMapper obj)
     {
         if (height == 1 || lenght == 1)
             return null;
@@ -373,39 +485,38 @@ public class BeatMapperEditor : Editor
         var arrow = Resources.Load<Texture2D>("Editor/editorArrow");
         var downArrow = Resources.Load<Texture2D>("Editor/editorArrow2");
 
-        if (beatMapper.calls == null)
-            beatMapper.calls = new List<BeatTiming>();
+        if (obj.timedCalls == null)
+            obj.timedCalls = new List<BeatTiming>();
         
-        foreach (var call in beatMapper.calls)
+        foreach (var c in obj.timedCalls)
         {
-            if(call == null)
+            if(c == null)
                 continue;
 
-            var arrow0 = TextureDrawingUtil.GetNewTintedTexture(arrow, call.call.editorColor);
+            var call = obj.GetCallFromCode(c.code);
+            
+            if(call == null)
+                continue;
+            
+            var arrow0 = TextureDrawingUtil.GetNewTintedTexture(arrow, call.editorColor);
             var downArrow0 =
                 TextureDrawingUtil.GetNewTintedTexture(downArrow,
-                    call.call.editorColor.AdjustSaturation(-0.42f));
+                    call.editorColor.AdjustSaturation(-0.42f));
             
-            int beatLenghtInPixels = Mathf.RoundToInt((beatMapper.BeatLenght * 0.25f / mainAudio.clip.length) * lenght);
+            int beatLenghtInPixels = Mathf.RoundToInt((obj.BeatLenght * 0.25f / mainAudio.clip.length) * lenght);
             
-            int x = Mathf.RoundToInt(((call.tempo+call.compass*0.25f) * beatMapper.BeatLenght / mainAudio.clip.length)*lenght) - 4;
+            int x = Mathf.RoundToInt(((c.tempo+c.compass*0.25f) * obj.BeatLenght / mainAudio.clip.length)*lenght) - 4;
             //int x = beatLenghtInPixels * Mathf.RoundToInt(call.tempo + call.compass * 0.25f) - 4;
             combinedArrowsTexture.OverlayTexture(x, halfHeight, arrow0);
 
-            for (int i = 0; i < call.call.awnserCount; i++)
+            //TODO propagacao de erro
+            for (int i = 0; i < call.answerCount; i++)
             {
-                int responseX = x + beatLenghtInPixels * call.call.awnsersSpacing * i + beatLenghtInPixels*call.call.awnserDistance;
+                int responseX = x + beatLenghtInPixels * call.answersSpacing * i + beatLenghtInPixels*call.answerDistance;
                 combinedArrowsTexture.OverlayTexture(responseX,0,downArrow0);
             }
             
-            
-            
-            //var a = new Rect(x, 0, 9, halfHeight);
-            //combinedArrowsTexture.PaintColorBlock(9, halfHeight, Color.magenta, x, halfHeight);
-            //combinedArrowsTexture.OverlayTexture(responseX, 0, downArrow0);
-            
         }
-
         return combinedArrowsTexture;
     }
 
@@ -435,6 +546,12 @@ public class BeatMapperEditor : Editor
         previousClip = mainAudio.clip;
         previousBpm = obj.bpm;
         ResetTextures();
+    }
+
+    private void RemoveCallType(BeatMapper obj, int callToDelete)
+    {
+        obj.RemoveCall(obj.callTypes[callToDelete].code);
+        RedrawArrows();
     }
 
 
