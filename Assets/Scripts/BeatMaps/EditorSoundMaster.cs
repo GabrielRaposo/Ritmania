@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -11,29 +12,101 @@ public class EditorSoundMaster : MonoBehaviour
     private Dictionary<AudioClip, SoundInEditor> soundControllers;
     [SerializeField] private AudioClip beepClip;
 
-    public SoundInEditor beepController;
-    public SoundInEditor mainAudioController;
+    private SoundInEditor beepController;
+    private SoundInEditor mainAudioController;
+
+    private BeatMapper currentMapper;
+
+    private bool initialized  => beepController != null && mainAudioController != null;
     private void OnEnable()
     {
-        if(soundControllers != null)
+        if(initialized)
             return;
 
         soundControllers = new Dictionary<AudioClip, SoundInEditor>();
 
-        beepController = NewSoundInEditor(null);
+        beepController = NewSoundInEditor(null, false);
         beepController._AudioSource.clip = beepClip;
 
-        mainAudioController = NewSoundInEditor(null);
+        mainAudioController = NewSoundInEditor(null, false);
+        
     }
 
-    public void AddController(AudioClip clip)
+    public void SetMapper(BeatMapper mapper)
     {
-        var sie = NewSoundInEditor(clip);
+        OnEnable();
+        
+        if(currentMapper == mapper)
+            return;
 
-        soundControllers.Add(clip, sie);
+        currentMapper = mapper;
+        
+        ClearControllers();
+
+        foreach (BeatCall call in mapper.callTypes)
+        {
+            if (call.answerClip != null)
+            {
+                if(!soundControllers.ContainsKey(call.answerClip));
+                    NewSoundInEditor(call.answerClip, true);
+            }
+
+            if (call.callClip != null)
+            {
+                if(!soundControllers.ContainsKey(call.callClip))
+                    NewSoundInEditor(call.callClip, true);
+            }
+            
+        }
+        
     }
 
-    private SoundInEditor NewSoundInEditor(AudioClip clip)
+    public void UpdateMapper(BeatMapper mapper)
+    {
+        if(soundControllers == null)
+            return;
+        
+        var allClips = soundControllers.Keys.ToList();
+
+        for (int i = allClips.Count - 1; i >= 0; i--)
+        {
+            var clip = allClips[i];
+            var match = mapper.callTypes.Find(a => a.callClip == clip || a.answerClip == clip);
+            if(match == null)
+                RemoveController(clip);
+        }
+
+        for (int i = 0; i < mapper.callTypes.Count; i++)
+        {
+            var call = mapper.callTypes[i];
+            
+            if(call.answerClip!=null)
+                if (!soundControllers.ContainsKey(call.answerClip))
+                    NewSoundInEditor(call.answerClip, true);
+            
+            if(call.callClip!=null)
+                if (!soundControllers.ContainsKey(call.callClip))
+                    NewSoundInEditor(call.callClip, true);
+        }
+        
+    }
+
+    
+    
+    private void ClearControllers()
+    {
+        if(soundControllers == null)
+            return;
+
+        var list = soundControllers.Keys.ToList();
+
+        for (int i = list.Count - 1; i >= 0; i--)
+        {
+            RemoveController(list[i]);    
+        }
+    }
+
+    private SoundInEditor NewSoundInEditor(AudioClip clip, bool addToDictionary)
     {
         var go = new GameObject();
         go.transform.SetParent(transform);
@@ -42,7 +115,25 @@ public class EditorSoundMaster : MonoBehaviour
 
         sie._AudioSource = audioSource;
         sie._AudioSource.clip = clip;
+        
+        if(addToDictionary)
+            if(clip!= null)
+                soundControllers.Add(clip, sie);
+        
         return sie;
+    }
+
+    private void RemoveController(AudioClip clip)
+    {
+        if(!soundControllers.ContainsKey(clip))
+            return;
+
+        soundControllers.TryGetValue(clip, out SoundInEditor toRemove);
+
+        if(toRemove!= null)
+            DestroyImmediate(toRemove.gameObject);
+        
+        soundControllers.Remove(clip);
     }
 
     public AudioSource GetAudioSource(AudioClip clip)
@@ -58,6 +149,14 @@ public class EditorSoundMaster : MonoBehaviour
         return a._AudioSource;
     }
 
+    public AudioSource GetMainSoundSource()
+    {
+        if (mainAudioController == null)
+            return null;
+
+        return mainAudioController._AudioSource;
+    }
+    
     public AudioSource GetBeepSource()
     {
         if (beepController == null)
@@ -68,6 +167,9 @@ public class EditorSoundMaster : MonoBehaviour
     
     public void OnValidate()
     {
+        if (!initialized)
+            OnEnable();
+        
         beepController._AudioSource.clip = beepClip;
     }
 }
