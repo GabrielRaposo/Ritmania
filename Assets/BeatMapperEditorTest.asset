@@ -33,8 +33,14 @@ MonoBehaviour:
     answerClip: {fileID: 8300000, guid: 94f4927624a7fcf48b4df6ba7a163856, type: 3}
   timedCalls:
   - tempo: 0
-    compass: 876
-    code: D3
-  - tempo: 2
-    compass: 2037
+    compass: 1
     code: 4A5
+  - tempo: 1
+    compass: 3
+    code: D3
+  - tempo: 3
+    compass: 0
+    code: D3
+  - tempo: 4
+    compass: 2
+    code: D3

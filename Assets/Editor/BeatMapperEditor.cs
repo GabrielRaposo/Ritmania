@@ -125,37 +125,41 @@ public class BeatMapperEditor : Editor
                 }
             }
 
-            // List<BeatTiming> answers = obj.timedCalls.FindAll(bt =>
-            // {
-            //     var call = obj.GetCallFromCode(bt.code);
-            //
-            //     if (call.answerCount <= 0) return false;
-            //
-            //     for (int i = 0; i < call.answerCount; i++)
-            //     {
-            //         int t = bt.tempo;
-            //         int c = bt.compass += call.answerDistance + call.answersSpacing * i;
-            //
-            //         if (c >= 4)
-            //         {
-            //             t += Mathf.FloorToInt(c / 4f);
-            //             c = c % 4;
-            //         }
-            //
-            //         if (time > (t * obj.BeatLenght) + (c * obj.BeatLenght * 0.25f))
-            //             return true;
-            //     }
-            //
-            //     return false;
-            //
-            // });
+            List<BeatTiming> answers = obj.timedCalls.FindAll(bt =>
+            {
+                var call = obj.GetCallFromCode(bt.code);
+            
+                if (call.answerCount <= 0) return false;
+            
+                for (int i = 0; i < call.answerCount; i++)
+                {
+                    int t = bt.tempo;
+                    int c = bt.compass + call.answerDistance + call.answersSpacing * i;
+                    
+                    //TODO jogar essa conta para dentro da classe
+                    if (c >= 4)
+                    {
+                        t += Mathf.FloorToInt(c / 4f);
+                        c = c % 4;
+                    }
+            
+                    if(!(t == nextT && c == nextC))
+                        continue;
+                    
+                    if (time > (t * obj.BeatLenght) + (c * obj.BeatLenght * 0.25f))
+                        return true;
+                }
+            
+                return false;
+            
+            });
 
-            // foreach (BeatTiming answer in answers)
-            // {
-            //     var sound = EditorSound.GetAudioSource(obj.GetCallFromCode(answer.code).answerClip);
-            //     if(sound!=null)
-            //         sound.Play();
-            // }
+            foreach (BeatTiming answer in answers)
+            {
+                var sound = EditorSound.GetAudioSource(obj.GetCallFromCode(answer.code).answerClip);
+                if(sound!=null)
+                    sound.Play();
+            }
             
         }
         
