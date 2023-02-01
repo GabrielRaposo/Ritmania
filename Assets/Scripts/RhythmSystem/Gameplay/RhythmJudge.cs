@@ -52,6 +52,14 @@ namespace RhythmSystem
 
             if (Input.GetKeyDown(KeyCode.Space)) 
                 TryToHitNote(conductor.songPosition);
+
+            foreach (Touch touch in Input.touches) 
+            {
+                if (touch.phase == TouchPhase.Began)
+                {
+                    TryToHitNote(conductor.songPosition);
+                }
+            }
         }
 
         private void SetCursorToFocusedNote()
