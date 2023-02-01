@@ -11,12 +11,12 @@ namespace RhythmSystem
     {
         // These values are tested for both early and late hits, 
         // so a 0.05 sec threshold is effectively a 0.10 sec leniency range
-        const float PERFECT_THRESHOLD = .05f;
-        const float GOOD_THRESHOLD    = .10f;
-        const float BAD_THRESHOLD     = .15f;
+        const float PERFECT_THRESHOLD = .07f;
+        const float GOOD_THRESHOLD    = .12f;
+        const float BAD_THRESHOLD     = .17f;
 
         // Minimum distance for a note to be interactable
-        const float RANGE_RADIUS = .3f; 
+        const float RANGE_RADIUS = .35f; 
 
         public Transform cursor;
 
@@ -31,6 +31,10 @@ namespace RhythmSystem
             this.conductor = conductor;
             this.beatTrack = beatTrack;
             isPlaying = true;
+        }
+
+        private void Start() {
+            //MobileInputReader.On
         }
 
         void LateUpdate()
@@ -50,16 +54,8 @@ namespace RhythmSystem
 
             SetCursorToFocusedNote();
 
-            if (Input.GetKeyDown(KeyCode.Space)) 
+            if (PlayerInputReader.AnyHitInput) 
                 TryToHitNote(conductor.songPosition);
-
-            foreach (Touch touch in Input.touches) 
-            {
-                if (touch.phase == TouchPhase.Began)
-                {
-                    TryToHitNote(conductor.songPosition);
-                }
-            }
         }
 
         private void SetCursorToFocusedNote()

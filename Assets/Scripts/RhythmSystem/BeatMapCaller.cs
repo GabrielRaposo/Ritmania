@@ -39,16 +39,8 @@ namespace RhythmSystem
             if (conductor.HasInitiated)
                 return;
             
-            if (Input.GetKeyDown(KeyCode.Return))
+            if (PlayerInputReader.StartInput)
                 StartBeatMap();
-
-            foreach (Touch touch in Input.touches) 
-            {
-                if (touch.phase == TouchPhase.Began)
-                {
-                    StartBeatMap();
-                }
-            }
         }
 
         private void StartBeatMap()
