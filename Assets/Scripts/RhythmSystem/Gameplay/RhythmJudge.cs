@@ -33,8 +33,10 @@ namespace RhythmSystem
             isPlaying = true;
         }
 
-        private void Start() {
+        private void Start() 
+        {
             //MobileInputReader.On
+            PlayerInputReader.AnyHitEvent += HitNoteAction;
         }
 
         void LateUpdate()
@@ -53,9 +55,15 @@ namespace RhythmSystem
             }
 
             SetCursorToFocusedNote();
+        }
 
-            if (PlayerInputReader.AnyHitInput) 
-                TryToHitNote(conductor.songPosition);
+        private void HitNoteAction()
+        {
+            // If there's no hit note on focus, return
+            if (!isPlaying || beatTrack.GetActiveHitNote() == null)
+                return;
+            
+            TryToHitNote (conductor.songPosition);
         }
 
         private void SetCursorToFocusedNote()

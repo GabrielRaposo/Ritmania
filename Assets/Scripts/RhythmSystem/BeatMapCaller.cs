@@ -31,16 +31,18 @@ namespace RhythmSystem
 
             conductor.Setup (beatMapData);
             beatTrack.Setup (conductor);
+
+            PlayerInputReader.AnyHitEvent += StartAction;
         }
 
-        void Update()
+        void StartAction()
         {
-            // Temp: waits for player input to run. Later on this task should be executed externally.
             if (conductor.HasInitiated)
                 return;
             
-            if (PlayerInputReader.StartInput)
-                StartBeatMap();
+            StartBeatMap();
+
+            PlayerInputReader.AnyHitEvent -= StartAction;
         }
 
         private void StartBeatMap()

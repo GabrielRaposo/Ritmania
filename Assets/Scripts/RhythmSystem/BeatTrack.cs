@@ -47,7 +47,11 @@ namespace RhythmSystem
         {
             beatmap = new List<double>();
             for (int i = 0; i < beatmapInBeats.Count; i++) 
+            {
                 beatmap.Add(beatmapInBeats[i] * conductor.secPerBeat);
+                if (i % 4 == 2)
+                    beatmap.Add((beatmapInBeats[i] +.5f) * conductor.secPerBeat);
+            }
         }
 
         public void StartBeatMap()

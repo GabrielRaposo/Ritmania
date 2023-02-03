@@ -53,7 +53,7 @@ namespace RhythmSystem
                 if (Mathf.Abs((float)hitOffset) < AUTOPLAY_THRESHOLD || conductor.songPosition >= beatTime)
                 {
                     transform.position = targetAnchor.position;
-                    Debug.Log($"Offset: { hitOffset.ToString("0.0000") }");
+                    //Debug.Log($"Offset: { hitOffset.ToString("0.0000") }");
                     OnHit(PrecisionScore.Perfect, hitOffset);
                 }
                 return;
