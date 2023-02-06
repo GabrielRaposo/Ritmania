@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic;using System.Security.Claims;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -8,20 +8,19 @@ using UnityEngine.Serialization;
 public class BeatCall
 {
     public string name;
-    [SerializeField]private string code;
-    public string Code
+    [FormerlySerializedAs("code")] [SerializeField]private string id;
+    public string ID
     {
         get
         {
-            if(code == "")
+            if(id == "")
                 Init();
-            return code;
+            return id;
         }
-        set => code = value;
+        set => id = value;
     }
-    public int answerDistance;
-    public  int answerCount;
-    public  int answersSpacing;
+
+    public List<BeatAnswerInformation> answerInfo;
 
     public Color editorColor;
 
@@ -33,13 +32,28 @@ public class BeatCall
         editorColor = Color.red;
         name = "Beat Call";
 
-        //code = Random.Range(0, 1728).ToString("X");
+        //id = Random.Range(0, 1728).ToString("X");
     }
 
     public void Init()
     {
-        code = Random.Range(0, 1728).ToString("X");
+        id = Random.Range(0, 1728).ToString("X");
     }
-    
-    
 }
+
+public enum BeatType {Normal, Dependent, HoldStart, HoldEnd}
+public class BeatAnswerInformation
+{
+    public int numerator;
+    public int denominator;
+
+    public BeatType beatType;
+
+    public BeatAnswerInformation()
+    {
+        numerator = 1;
+        denominator = 4;
+    }
+
+    public float Fraction() => (float)numerator / denominator;
+} 
