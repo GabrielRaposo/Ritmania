@@ -12,15 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96c2ff8941a1b8144ac10ec013d0e6ea, type: 3}
   m_Name: Stage0_BeatCall2
   m_EditorClassIdentifier: 
-  tag: Beat Call
+  tag: Beat Call 2
   id: 1
+  editorColor: {r: 0.09078467, g: 1, b: 0, a: 1}
+  callClip: {fileID: 8300000, guid: cebb22b1b4253fa408a2a295efdd3fea, type: 3}
+  callClipVolume: 1
   answerInfo:
   - numerator: 2
     denominator: 2
+    editorColor: {r: 0, g: 0, b: 0, a: 0}
     beatType: 0
+    audioClip: {fileID: 8300000, guid: 51bc87ee497720641b7ae95a90a31d75, type: 3}
+    audioVolume: 0.2
   - numerator: 3
     denominator: 2
+    editorColor: {r: 0, g: 0, b: 0, a: 0}
     beatType: 0
-  editorColor: {r: 1, g: 0, b: 0, a: 1}
-  callClip: {fileID: 8300000, guid: cebb22b1b4253fa408a2a295efdd3fea, type: 3}
+    audioClip: {fileID: 8300000, guid: 95e9d2c07dd6c5f4696ea9b3a46cf37d, type: 3}
+    audioVolume: 0.2
   answerClip: {fileID: 8300000, guid: 95e9d2c07dd6c5f4696ea9b3a46cf37d, type: 3}

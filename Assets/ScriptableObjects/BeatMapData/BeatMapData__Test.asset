@@ -17,3 +17,5 @@ MonoBehaviour:
   BeatsShownInAdvance: 2
   FirstBeatOffset: 0.05
   MissThreshold: 0.5
+  beatCalls:
+  - {fileID: 11400000, guid: ee7c93607f1b68b46b7cc0ba259dae1b, type: 2}

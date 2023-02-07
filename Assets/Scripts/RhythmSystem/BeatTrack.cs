@@ -24,11 +24,13 @@ namespace RhythmSystem
         List<HitNote> activeNotes;   // Queue of the active hit notes that are on screen
 
         Conductor conductor; 
+        BeatMapData beatMapData;
 
         // This class should be always set-up by the BeatMapCaller.
-        public void Setup (Conductor conductor)
+        public void Setup (Conductor conductor, BeatMapData beatMapData)
         {
             this.conductor = conductor;
+            this.beatMapData = beatMapData;
 
             activeNotes = new List<HitNote>();
 
@@ -49,8 +51,6 @@ namespace RhythmSystem
             for (int i = 0; i < beatmapInBeats.Count; i++) 
             {
                 beatmap.Add(beatmapInBeats[i] * conductor.secPerBeat);
-                if (i % 4 == 2)
-                    beatmap.Add((beatmapInBeats[i] +.5f) * conductor.secPerBeat);
             }
         }
 

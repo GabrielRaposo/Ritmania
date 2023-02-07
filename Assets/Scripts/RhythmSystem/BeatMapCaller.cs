@@ -30,7 +30,7 @@ namespace RhythmSystem
             }
 
             conductor.Setup (beatMapData);
-            beatTrack.Setup (conductor);
+            beatTrack.Setup (conductor, beatMapData);
 
             PlayerInputReader.AnyHitEvent += StartAction;
         }

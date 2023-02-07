@@ -21,13 +21,18 @@ public class BeatCall : ScriptableObject
         set => id = value;
     }
 
+    [Header("Call Info")]
+    public Color editorColor;
+    public AudioClip callClip;
+    public float callClipVolume = 1.0f;
+
+    [Space(10)]
     public List<BeatAnswerInformation> answerInfo;
 
-    public Color editorColor;
-
-    public AudioClip callClip;
-    public AudioClip answerClip;
-
+    // -- TO-DO: remover pois agora está informação esta presente no BeatAnswerInformation
+    [Header("Remove this later:")]
+    public AudioClip answerClip; 
+    // -- 
 
     public BeatCall()
     {
@@ -51,7 +56,10 @@ public class BeatAnswerInformation
     public int numerator;
     public int denominator;
 
+    public Color editorColor;
     public BeatType beatType;
+    public AudioClip audioClip;
+    [Range(0f, 1.0f)] public float audioVolume = 1.0f;
 
     public BeatAnswerInformation()
     {
