@@ -4,16 +4,17 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+[CreateAssetMenu(fileName = "_BeatCall", menuName = "ScriptableObjects/BeatCall")]
 [System.Serializable]
-public class BeatCall
+public class BeatCall : ScriptableObject
 {
-    public string name;
-    [FormerlySerializedAs("code")] [SerializeField]private string id;
+    public string tag;
+    [FormerlySerializedAs("code")] [SerializeField] private string id;
     public string ID
     {
         get
         {
-            if(id == "")
+            if (id == "")
                 Init();
             return id;
         }
@@ -27,10 +28,11 @@ public class BeatCall
     public AudioClip callClip;
     public AudioClip answerClip;
 
+
     public BeatCall()
     {
         editorColor = Color.red;
-        name = "Beat Call";
+        tag = "Beat Call";
 
         //id = Random.Range(0, 1728).ToString("X");
     }
@@ -42,6 +44,8 @@ public class BeatCall
 }
 
 public enum BeatType {Normal, Dependent, HoldStart, HoldEnd}
+
+[System.Serializable]
 public class BeatAnswerInformation
 {
     public int numerator;

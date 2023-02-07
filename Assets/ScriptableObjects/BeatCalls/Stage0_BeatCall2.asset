@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96c2ff8941a1b8144ac10ec013d0e6ea, type: 3}
+  m_Name: Stage0_BeatCall2
+  m_EditorClassIdentifier: 
+  tag: Beat Call
+  id: 1
+  answerInfo:
+  - numerator: 2
+    denominator: 2
+    beatType: 0
+  - numerator: 3
+    denominator: 2
+    beatType: 0
+  editorColor: {r: 1, g: 0, b: 0, a: 1}
+  callClip: {fileID: 8300000, guid: cebb22b1b4253fa408a2a295efdd3fea, type: 3}
+  answerClip: {fileID: 8300000, guid: 95e9d2c07dd6c5f4696ea9b3a46cf37d, type: 3}

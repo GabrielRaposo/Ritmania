@@ -256,7 +256,7 @@ public class BeatMapperEditor : Editor
         {
             int index = i;
 
-            var button = GUILayout.Button($"{obj.callTypes[index].name}", GUILayout.Width(95), GUILayout.Height(27));
+            var button = GUILayout.Button($"{obj.callTypes[index].tag}", GUILayout.Width(95), GUILayout.Height(27));
             if (button)
             {
                 obj.timedCalls.Add(new BeatTiming(beatTempo, beatCompass, obj.callTypes[index].ID));
@@ -299,7 +299,7 @@ public class BeatMapperEditor : Editor
             GUILayout.BeginHorizontal();
             GUILayout.Label($"{i}:", GUILayout.Width(25));
             GUILayout.FlexibleSpace();
-            call.name = GUILayout.TextField(call.name,GUILayout.Width(140));
+            call.tag = GUILayout.TextField(call.tag,GUILayout.Width(140));
 
             if (GUILayout.Button("X", GUILayout.Width(18)))
                 callToDelete = i;

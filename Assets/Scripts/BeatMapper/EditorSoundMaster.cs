@@ -47,7 +47,7 @@ public class EditorSoundMaster : MonoBehaviour
         {
             if (call.answerClip != null)
             {
-                if(!soundControllers.ContainsKey(call.answerClip));
+                if(!soundControllers.ContainsKey(call.answerClip))
                     NewSoundInEditor(call.answerClip, true);
             }
 
@@ -56,9 +56,7 @@ public class EditorSoundMaster : MonoBehaviour
                 if(!soundControllers.ContainsKey(call.callClip))
                     NewSoundInEditor(call.callClip, true);
             }
-            
-        }
-        
+        }   
     }
 
     public void UpdateMapper(BeatMapper mapper)
@@ -87,11 +85,8 @@ public class EditorSoundMaster : MonoBehaviour
             if(call.callClip!=null)
                 if (!soundControllers.ContainsKey(call.callClip))
                     NewSoundInEditor(call.callClip, true);
-        }
-        
+        }   
     }
-
-    
     
     private void ClearControllers()
     {
