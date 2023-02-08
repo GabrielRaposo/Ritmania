@@ -67,5 +67,5 @@ public class BeatAnswerInformation
         denominator = 4;
     }
 
-    public float Fraction() => (float)numerator / denominator;
+    public float Fraction() => (float) numerator / denominator;
 } 

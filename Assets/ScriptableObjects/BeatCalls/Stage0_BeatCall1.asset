@@ -16,7 +16,7 @@ MonoBehaviour:
   id: 0
   editorColor: {r: 1, g: 0, b: 0, a: 1}
   callClip: {fileID: 8300000, guid: 94f4927624a7fcf48b4df6ba7a163856, type: 3}
-  callClipVolume: 1
+  callClipVolume: 0.2
   answerInfo:
   - numerator: 1
     denominator: 1

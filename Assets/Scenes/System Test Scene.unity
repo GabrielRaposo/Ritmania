@@ -1621,6 +1621,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f812af58109b73840bfc30f5a698fd4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1588471251
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1588471252}
+  - component: {fileID: 1588471253}
+  m_Layer: 0
+  m_Name: Cue Notes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1588471252
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588471251}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1617281360}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1588471253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588471251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c9cc380a7e2641448f0842ec529a44f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefab: {fileID: 8477976061768369101, guid: b934dd73117a29f41b0e9a422fd2a353, type: 3}
+  quantity: 20
 --- !u!1 &1617281359
 GameObject:
   m_ObjectHideFlags: 0
@@ -1652,6 +1698,7 @@ Transform:
   m_Children:
   - {fileID: 1148902735}
   - {fileID: 1888598350}
+  - {fileID: 1588471252}
   - {fileID: 1819757360}
   - {fileID: 1786249681}
   m_Father: {fileID: 1289315897}
@@ -1670,7 +1717,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rhythmJudge: {fileID: 224892254}
+  cuesPool: {fileID: 1588471253}
   notesPool: {fileID: 1819757361}
+  callSoundController: {fileID: 1786249682}
   spawnAnchor: {fileID: 1148902735}
   targetAnchor: {fileID: 1888598350}
 --- !u!1 &1673925712
@@ -1726,8 +1775,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1786249681}
+  - component: {fileID: 1786249682}
   m_Layer: 0
-  m_Name: Cue Sound Player
+  m_Name: Call Sound Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1746,8 +1796,21 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1617281360}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1786249682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786249680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d90afa3393b402947aa4a09561d99d82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioMixerGroup: {fileID: -7779180049526819937, guid: 2145a83007c6c524f8902c9c3e5eeadd, type: 2}
 --- !u!1 &1787817233
 GameObject:
   m_ObjectHideFlags: 0
@@ -1835,7 +1898,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1617281360}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1819757361
 MonoBehaviour:

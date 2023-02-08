@@ -9,6 +9,8 @@ namespace RhythmSystem
     {
         const double AUTOPLAY_THRESHOLD = .001d;
 
+        string noteTag;
+
         double beatTime;
         double timeShownInAdvance;
 
@@ -16,17 +18,21 @@ namespace RhythmSystem
         Conductor conductor;
 
         Transform spawnAnchor;
-        Transform targetAnchor;        
+        Transform targetAnchor;
 
         public double BeatTime => beatTime;
+        public virtual bool IsCue => false; // <<< COMMENT HERE
 
         public void Setup 
         (
+            string noteTag,
             double beatTime, double timeShownInAdvance, 
             BeatTrack beatTrack, Conductor conductor, 
             Transform spawnAnchor, Transform targetAnchor
         )
         {
+            this.noteTag = noteTag;
+
             this.beatTime = beatTime;
             this.timeShownInAdvance = timeShownInAdvance;
 
@@ -47,7 +53,7 @@ namespace RhythmSystem
                 
             LerpPosition();
 
-            if (GameManager.AutoPlay)
+            if (IsCue || GameManager.AutoPlay)
             {
                 double hitOffset = conductor.songPosition - beatTime;
                 if (Mathf.Abs((float)hitOffset) < AUTOPLAY_THRESHOLD || conductor.songPosition >= beatTime)
@@ -93,7 +99,7 @@ namespace RhythmSystem
             }
         }
 
-        public void OnHit (PrecisionScore score, double offset)
+        public virtual void OnHit (PrecisionScore score, double offset)
         {
             switch(score) 
             {
