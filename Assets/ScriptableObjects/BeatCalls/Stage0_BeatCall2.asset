@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96c2ff8941a1b8144ac10ec013d0e6ea, type: 3}
   m_Name: Stage0_BeatCall2
   m_EditorClassIdentifier: 
-  tag: Beat Call 2
+  tag: TwoHits
   id: 1
   editorColor: {r: 0.09078467, g: 1, b: 0, a: 1}
   callClip: {fileID: 8300000, guid: cebb22b1b4253fa408a2a295efdd3fea, type: 3}
   callClipVolume: 0.2
   answerInfo:
-  - numerator: 2
+  - numerator: 1
     denominator: 2
     editorColor: {r: 0, g: 0, b: 0, a: 0}
     beatType: 0

@@ -58,6 +58,7 @@ public class BeatAnswerInformation
 
     public Color editorColor;
     public BeatType beatType;
+    public InputRegion inputRegion;
     public AudioClip audioClip;
     [Range(0f, 1.0f)] public float audioVolume = 1.0f;
 

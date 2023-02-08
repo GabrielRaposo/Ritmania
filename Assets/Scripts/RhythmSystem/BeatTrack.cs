@@ -36,7 +36,7 @@ namespace RhythmSystem
         // -- Beatmap
         List<float> beatmapInBeats;  
         List<NoteData> beatmapCues;
-        List<double> beatmapHits;
+        List<NoteData> beatmapHits;
         List<CueHitNote> cueHitNotes; // <<< COMMENT HERE
         List<HitNote> activeHitNotes;   // Queue of the active hit notes that are on screen
 
@@ -67,10 +67,21 @@ namespace RhythmSystem
             if (beatMapData.beatCalls.Count < 1)
                 return;
 
+            // The Cue tag is set to beatCall.tag, ex: "MyCall"
+            // The Hit tags are set to beatCall.tag + their position on the list, ex: "MyCall0", "MyCall1"
             for (int i = 0; i < beatMapData.beatCalls.Count; i++)
             {
                 BeatCall beatCall = beatMapData.beatCalls[i];
                 callSoundController.AddCallData(beatCall.tag, beatCall.callClip, beatCall.callClipVolume);
+
+                if (beatCall.answerInfo.Count < 1)
+                    continue;
+
+                for (int j = 0; j < beatCall.answerInfo.Count; j++)
+                {
+                    BeatAnswerInformation answerInfo = beatCall.answerInfo[j];
+                    callSoundController.AddCallData(beatCall.tag + j, answerInfo.audioClip, answerInfo.audioVolume);
+                }
             }
         }
 
@@ -81,15 +92,14 @@ namespace RhythmSystem
             beatmapInBeats = new List<float>();
             for (int i = 0; i < 100; i++) beatmapInBeats.Add(i * 2);
 
-            string cueTag = beatMapData.beatCalls[0].tag;
-            // --
-
             beatmapCues = new List<NoteData>();
             for (int i = 0; i < beatmapInBeats.Count; i++) 
             {
+                //string cueTag = beatMapData.beatCalls[1].tag;
+                string cueTag = beatMapData.beatCalls[Random.Range(0,2)].tag;
+
                 beatmapCues.Add( new NoteData(cueTag, beatmapInBeats[i] * conductor.secPerBeat) );
             }
-
         }
 
         public void MakeHitNotesList()
@@ -97,7 +107,7 @@ namespace RhythmSystem
             if (!beatMapData)
                 return;
 
-            beatmapHits = new List<double>();
+            beatmapHits = new List<NoteData>();
 
             foreach (NoteData cueData in beatmapCues)
             {
@@ -105,12 +115,15 @@ namespace RhythmSystem
                 if (beatCall == null)
                     continue;
 
-                foreach (BeatAnswerInformation answerInfo in beatCall.answerInfo)
+                for (int i = 0; i < beatCall.answerInfo.Count; i++)
                 {
-                    double d = cueData.time + (answerInfo.Fraction() * conductor.secPerBeat);
+                    BeatAnswerInformation answerInfo = beatCall.answerInfo[i];
+
                     // TO-DO: fazer esse tempo não depender de cueData.time para evitar proliferação de erros de arredondamento
-                    beatmapHits.Add(d);
-                    Debug.Log("d: " + d);
+                    double time = cueData.time + (answerInfo.Fraction() * conductor.secPerBeat);
+                    beatmapHits.Add( new NoteData(beatCall.tag + i, time) );
+
+                    Debug.Log("time: " + time);
                 }
             }
 
@@ -146,12 +159,14 @@ namespace RhythmSystem
             }
 
             // If it's X-seconds before the time for the note to be hit, spawn it
-            if (conductor.songPosition + timeShownInAdvance > beatmapHits[nextHitIndex])
+            if (conductor.songPosition + timeShownInAdvance > beatmapHits[nextHitIndex].time)
             {
                 SpawnHitNote (beatmapHits[nextHitIndex], timeShownInAdvance);
                 nextHitIndex++;
+                return;
             }
         }
+
         private void SpawnCueNote(NoteData noteData, double timeShownInAdvance)
         { 
             GameObject note = cuesPool.GetFromPool();
@@ -163,14 +178,14 @@ namespace RhythmSystem
             cueHitNotes.Add(cueNote); // Enqueue the Hit Notes so they are visible by the Rhythm Judge in order
         }
 
-        private void SpawnHitNote(double currentNoteTime, double timeShownInAdvance)
+        private void SpawnHitNote(NoteData noteData, double timeShownInAdvance)
         { 
             GameObject note = notesPool.GetFromPool();
             HitNote hitNote = note.GetComponent<HitNote>();
             if (!hitNote)
                 return;
 
-            hitNote.Setup("", currentNoteTime, timeShownInAdvance, this, conductor, spawnAnchor, targetAnchor);
+            hitNote.Setup(noteData.tag, noteData.time, timeShownInAdvance, this, conductor, spawnAnchor, targetAnchor);
             activeHitNotes.Add(hitNote); // Enqueue the Hit Notes so they are visible by the Rhythm Judge in order
         }
 

@@ -10,6 +10,8 @@ public enum PlatformState
     Mobile
 }
 
+public enum InputRegion { Any, Left, Right }
+
 public class PlayerInputReader : MonoBehaviour
 {
     const float SWIPE_THRESHOLD = -.5f;
