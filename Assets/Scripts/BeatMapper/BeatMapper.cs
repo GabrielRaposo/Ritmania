@@ -23,7 +23,7 @@ public class BeatMapper : ScriptableObject
                 timedCalls.RemoveAt(i);
         }
 
-        var toRemove = callTypes.Find(a => a.Code == code);
+        var toRemove = callTypes.Find(a => a.ID == code);
         
         if(toRemove!= null)
             callTypes.Remove(toRemove);
@@ -31,9 +31,13 @@ public class BeatMapper : ScriptableObject
 
     public BeatCall GetCallFromCode(string code)
     {
-        return callTypes.Find(a => a.Code == code);
+        return callTypes.Find(a => a.ID == code);
     }
-    
+
+    public float GetTimeFromTempo(int objTempo, int objCompass)
+    {
+        return objTempo * BeatLenght + objCompass * BeatLenght * 0.25f;
+    }
 }
 
 [System.Serializable]
@@ -51,26 +55,18 @@ public class BeatTiming
         this.code = code;
     }
 
-    public List<Tuple<int, int>> GetAnswersTiming(BeatMapper map)
+    public List<double> GetAnswersTiming(BeatMapper map)
     {
         var call = map.GetCallFromCode(code);
         if (call == null)
             return null;
 
-        var list = new List<Tuple<int, int>>();
+        var list = new List<double>();
         
-        for (int i = 0; i < call.answerCount; i++)
+        for (int i = 0; i < call.answerInfo.Count; i++)
         {
-            int t = tempo;
-            int c = compass + call.answerDistance + call.answersSpacing * i;
-                    
-            if (c >= 4)
-            {
-                t += Mathf.FloorToInt(c / 4f);
-                c = c % 4;
-            }
-            
-            list.Add(new Tuple<int, int>(t,c));
+            var info = call.answerInfo[i];
+            list.Add(info.Fraction()*map.BeatLenght);
         }
 
         return list;

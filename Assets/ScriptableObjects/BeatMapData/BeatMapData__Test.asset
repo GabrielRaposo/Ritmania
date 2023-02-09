@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45a72f3371cef2c4e868de24e0f44869, type: 3}
-  m_Name: BeatMapData__Test2
+  m_Name: BeatMapData__Test
   m_EditorClassIdentifier: 
-  Music: {fileID: 8300000, guid: b399cf8c18bac9c47a6ca81b263d87ff, type: 3}
-  BPM: 60
-  BeatsShownInAdvance: 3
-  FirstBeatOffset: 0
+  Music: {fileID: 8300000, guid: 31d1353218aab8e429a12a7f90c426e6, type: 3}
+  BPM: 75
+  BeatsShownInAdvance: 2
+  FirstBeatOffset: 0.05
   MissThreshold: 0.5
+  beatCalls:
+  - {fileID: 11400000, guid: ee7c93607f1b68b46b7cc0ba259dae1b, type: 2}

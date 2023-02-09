@@ -1,45 +1,77 @@
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic;using System.Security.Claims;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+[CreateAssetMenu(fileName = "_BeatCall", menuName = "ScriptableObjects/BeatCall")]
 [System.Serializable]
-public class BeatCall
+public class BeatCall : ScriptableObject
 {
-    public string name;
-    [SerializeField]private string code;
-    public string Code
+    public string tag;
+    [FormerlySerializedAs("code")] [SerializeField] private string id;
+    public string ID
     {
         get
         {
-            if(code == "")
+            if (id == "")
                 Init();
-            return code;
+            return id;
         }
-        set => code = value;
+        set => id = value;
     }
-    public int answerDistance;
-    public  int answerCount;
-    public  int answersSpacing;
 
+    [Header("Call Info")]
     public Color editorColor;
-
     public AudioClip callClip;
-    public AudioClip answerClip;
+    public float callClipVolume = 1.0f;
+
+    [Space(10)]
+    public List<BeatAnswerInformation> answerInfo;
+
+    // -- TO-DO: remover pois agora está informação esta presente no BeatAnswerInformation
+    [Header("Remove this later:")]
+    public AudioClip answerClip; 
+    // -- 
 
     public BeatCall()
     {
         editorColor = Color.red;
-        name = "Beat Call";
+        tag = "Beat Call";
 
-        //code = Random.Range(0, 1728).ToString("X");
+        //id = Random.Range(0, 1728).ToString("X");
     }
 
     public void Init()
     {
-        code = Random.Range(0, 1728).ToString("X");
+        id = Random.Range(0, 1728).ToString("X");
     }
-    
-    
 }
+
+public enum BeatType {Normal, Dependent, HoldStart, HoldEnd}
+
+[System.Serializable]
+public class BeatAnswerInformation
+{
+    public Color editorColor;
+
+    public int numerator;
+    public int denominator;
+
+    public BeatType beatType;
+    public InputRegion inputRegion;
+
+    public AudioClip hitAudioClip;
+    [Range(0f, 1.0f)] public float hitAudioVolume = .2f;
+
+    public AudioClip missAudioClip;
+    [Range(0f, 1.0f)] public float missAudioVolume = .2f;
+
+    public BeatAnswerInformation()
+    {
+        numerator = 1;
+        denominator = 4;
+    }
+
+    public float Fraction() => (float) numerator / denominator;
+} 

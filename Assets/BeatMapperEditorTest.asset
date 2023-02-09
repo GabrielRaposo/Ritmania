@@ -16,31 +16,22 @@ MonoBehaviour:
   bpm: 50
   callTypes:
   - name: Beat Call
-    code: D3
-    answerDistance: 3
-    answerCount: 1
-    answersSpacing: 1
+    id: D3
     editorColor: {r: 1, g: 0, b: 0, a: 1}
     callClip: {fileID: 8300000, guid: cebb22b1b4253fa408a2a295efdd3fea, type: 3}
     answerClip: {fileID: 8300000, guid: 94f4927624a7fcf48b4df6ba7a163856, type: 3}
   - name: Beat Call
-    code: 4A5
-    answerDistance: 3
-    answerCount: 2
-    answersSpacing: 1
-    editorColor: {r: 0.9811321, g: 0.8000669, b: 0.0046279924, a: 1}
-    callClip: {fileID: 8300000, guid: 367b88f7c7f70554e83fdd01247c317d, type: 3}
-    answerClip: {fileID: 8300000, guid: 94f4927624a7fcf48b4df6ba7a163856, type: 3}
+    id: 
+    editorColor: {r: 0.96449614, g: 1, b: 0.033018887, a: 1}
+    callClip: {fileID: 8300000, guid: cebb22b1b4253fa408a2a295efdd3fea, type: 3}
+    answerClip: {fileID: 8300000, guid: 367b88f7c7f70554e83fdd01247c317d, type: 3}
   timedCalls:
-  - tempo: 0
-    compass: 1
-    code: 4A5
-  - tempo: 1
-    compass: 3
-    code: D3
-  - tempo: 3
+  - tempo: 2
     compass: 0
     code: D3
   - tempo: 4
-    compass: 2
+    compass: 0
     code: D3
+  - tempo: 6
+    compass: 0
+    code: 

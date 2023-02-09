@@ -10,4 +10,8 @@ public class BeatMapData : ScriptableObject
     public float BeatsShownInAdvance;
     public float FirstBeatOffset;
     public float MissThreshold;
+
+    [Space(10)]
+
+    public List<BeatCall> beatCalls;
 }

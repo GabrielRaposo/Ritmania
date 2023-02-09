@@ -14,15 +14,22 @@ public class GameManager : MonoBehaviour
     {
         Application.targetFrameRate = 60;
         SetAutoPlay(false);
+
+        PlayerInputReader.StartInputEvent += ToggleAutoPlayAction;
     }
 
     private void Update() 
     {
         if (Input.GetKeyDown(KeyCode.A))
-            SetAutoPlay(!AutoPlay);
+            ToggleAutoPlayAction();
 
         if (Input.GetKeyDown(KeyCode.R))
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void ToggleAutoPlayAction()
+    {
+        SetAutoPlay(!AutoPlay);
     }
 
     private void SetAutoPlay(bool value)

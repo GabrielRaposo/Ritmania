@@ -26,6 +26,9 @@ public class BeatMapperEditor : Editor
 
     private Rect timelineRect;
 
+    private List<float> answerBeatTimings;
+    private List<AudioClip> answerBeatClips;
+
     //StoredValues
     private AudioClip previousClip;
     private int previousBpm;
@@ -125,37 +128,16 @@ public class BeatMapperEditor : Editor
                 }
             }
 
-            List<BeatTiming> answers = obj.timedCalls.FindAll(bt =>
+            for (var index = 0; index < answerBeatTimings.Count; index++)
             {
-                var call = obj.GetCallFromCode(bt.code);
-            
-                if (call.answerCount <= 0) return false;
-
-                var list = bt.GetAnswersTiming(obj);
-
-                for (int i = 0; i < list.Count; i++)
+                float t = answerBeatTimings[index];
+                if (previousTime < t && t < time)
                 {
-                    int t = list[i].Item1;
-                    int c = list[i].Item2;
-                    
-                    if(!(t == nextT && c == nextC))
-                        continue;
-                    
-                    if (time > (t * obj.BeatLenght) + (c * obj.BeatLenght * 0.25f))
-                        return true;
+                    var sound = EditorSound.GetAudioSource(answerBeatClips[index]);
+                    if (sound != null)
+                        sound.Play();
                 }
-
-                return false;
-            
-            });
-
-            foreach (BeatTiming answer in answers)
-            {
-                var sound = EditorSound.GetAudioSource(obj.GetCallFromCode(answer.code).answerClip);
-                if(sound!=null)
-                    sound.Play();
             }
-            
         }
         
         beatTempo = Mathf.FloorToInt(previousTime / obj.BeatLenght);
@@ -274,10 +256,10 @@ public class BeatMapperEditor : Editor
         {
             int index = i;
 
-            var button = GUILayout.Button($"{obj.callTypes[index].name}", GUILayout.Width(95), GUILayout.Height(27));
+            var button = GUILayout.Button($"{obj.callTypes[index].tag}", GUILayout.Width(95), GUILayout.Height(27));
             if (button)
             {
-                obj.timedCalls.Add(new BeatTiming(beatTempo, beatCompass, obj.callTypes[index].Code));
+                obj.timedCalls.Add(new BeatTiming(beatTempo, beatCompass, obj.callTypes[index].ID));
                 RedrawArrows();
             }
         }
@@ -303,27 +285,62 @@ public class BeatMapperEditor : Editor
 
         int callToDelete = -1;
         
-        GUILayout.BeginHorizontal(); //A
+        /*A-*/
+        GUILayout.BeginHorizontal(); 
         
         for (int i = 0; i < obj.callTypes.Count; i++)
         {
-            GUILayout.BeginVertical("Box", GUILayout.Width(150)); //B
+            /*B     */
+            GUILayout.BeginVertical("Box", GUILayout.Width(150)); 
             
             BeatCall call = obj.callTypes[i];
             
-            GUILayout.BeginHorizontal(); //C
+            /*C        */
+            GUILayout.BeginHorizontal();
             GUILayout.Label($"{i}:", GUILayout.Width(25));
             GUILayout.FlexibleSpace();
-            call.name = GUILayout.TextField(call.name,GUILayout.Width(140));
+            call.tag = GUILayout.TextField(call.tag,GUILayout.Width(140));
 
             if (GUILayout.Button("X", GUILayout.Width(18)))
                 callToDelete = i;
             
-            GUILayout.EndHorizontal(); //C0
+            GUILayout.EndHorizontal();
+            /*C0        */
 
-            call.answerCount = MyEditorTools.CompactedIntField("Count", call.answerCount, fieldOptions:new[] { GUILayout.Width(40) });
-            call.answerDistance = MyEditorTools.CompactedIntField("Distance", call.answerDistance, fieldOptions:new[] { GUILayout.Width(40) });
-            call.answersSpacing = MyEditorTools.CompactedIntField("Spacing", call.answersSpacing, fieldOptions:new []{GUILayout.Width(40)});
+            /*D         */
+            GUILayout.BeginVertical();
+
+            if (call.answerInfo == null)
+                call.answerInfo = new List<BeatAnswerInformation>();
+
+            int toDelete = -1;
+            
+            for (int j = 0; j < call.answerInfo.Count; j++)
+            {
+                int infoIndex = j;
+                var info = call.answerInfo[infoIndex];
+                
+                GUILayout.BeginHorizontal();
+                info.numerator = EditorGUILayout.IntField(info.numerator, GUILayout.Width(22));
+                GUILayout.Label("/", GUILayout.Width(8));
+                info.denominator = EditorGUILayout.IntField(info.denominator, GUILayout.Width(22));
+                info.beatType = (BeatType)EditorGUILayout.EnumPopup(info.beatType);
+                if (GUILayout.Button("X", GUILayout.Width(18)))
+                    toDelete = infoIndex;
+                GUILayout.EndHorizontal();
+                
+                if (info.denominator < 1)
+                    info.denominator = 1;
+            }
+            
+            if(toDelete != -1)
+                call.answerInfo.RemoveAt(toDelete);
+
+            if(GUILayout.Button("+", GUILayout.Width(26)))
+                call.answerInfo.Add(new BeatAnswerInformation());
+            
+            GUILayout.EndVertical();
+            /*D0        */
 
             GUILayout.Space(8);
 
@@ -333,7 +350,8 @@ public class BeatMapperEditor : Editor
             call.editorColor = EditorGUILayout.ColorField(call.editorColor);
             call.editorColor = new Color(call.editorColor.r, call.editorColor.g, call.editorColor.b, 1f);
 
-            GUILayout.EndVertical(); //B0
+            GUILayout.EndVertical();
+            /*B0    */
             
             EditorSound.UpdateMapper(obj);
         }
@@ -347,7 +365,8 @@ public class BeatMapperEditor : Editor
         if(GUILayout.Button("Add +"))
             obj.callTypes.Add(new BeatCall());
         
-        GUILayout.EndHorizontal(); //A0
+        GUILayout.EndHorizontal();
+        /*A0*/
         
         GUILayout.EndScrollView();
         
@@ -476,6 +495,9 @@ public class BeatMapperEditor : Editor
                 return combinedArrowsTexture;
         }
 
+        answerBeatTimings = new List<float>();
+        answerBeatClips = new List<AudioClip>();
+
         combinedArrowsTexture = TextureDrawingUtil.GetFill(lenght, height, Color.clear);
 
         int halfHeight = Mathf.FloorToInt(height/2f);
@@ -508,16 +530,14 @@ public class BeatMapperEditor : Editor
             
             combinedArrowsTexture.OverlayTexture(x, halfHeight, arrow0);
 
-            //TODO propagacao de erro
-            
-            //int x = Mathf.RoundToInt(((i * (obj.BeatLenght/4f) / mainAudio.clip.length)*lenght));
-            
-            for (int i = 0; i < call.answerCount; i++)
+            for (int i = 0; i < call.answerInfo.Count; i++)
             {
-                //int responseX = x + beatLenghtInPixels * call.answersSpacing * i + beatLenghtInPixels*call.answerDistance;
+                float answerTime = obj.GetTimeFromTempo(c.tempo, c.compass) +  call.answerInfo[i].Fraction() * obj.BeatLenght;
+                answerBeatTimings.Add(answerTime);
+                answerBeatClips.Add(call.answerClip);
                 int responseX = Mathf.RoundToInt
                 (
-                    (c.tempo + (c.compass + call.answerDistance + (call.answersSpacing * i)) * 0.25f) * obj.BeatLenght /
+                    answerTime/
                     mainAudio.clip.length * lenght
                 ) - 4;
                 combinedArrowsTexture.OverlayTexture(responseX,0,downArrow0);
@@ -557,7 +577,7 @@ public class BeatMapperEditor : Editor
 
     private void RemoveCallType(BeatMapper obj, int callToDelete)
     {
-        obj.RemoveCall(obj.callTypes[callToDelete].Code);
+        obj.RemoveCall(obj.callTypes[callToDelete].ID);
         RedrawArrows();
     }
 
