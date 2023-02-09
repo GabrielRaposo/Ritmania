@@ -18,10 +18,13 @@ MonoBehaviour:
   callClip: {fileID: 8300000, guid: 94f4927624a7fcf48b4df6ba7a163856, type: 3}
   callClipVolume: 0.2
   answerInfo:
-  - numerator: 2
+  - editorColor: {r: 0, g: 0, b: 0, a: 0}
+    numerator: 2
     denominator: 2
-    editorColor: {r: 0, g: 0, b: 0, a: 0}
     beatType: 0
-    audioClip: {fileID: 8300000, guid: 95e9d2c07dd6c5f4696ea9b3a46cf37d, type: 3}
-    audioVolume: 0
+    inputRegion: 0
+    hitAudioClip: {fileID: 8300000, guid: 95e9d2c07dd6c5f4696ea9b3a46cf37d, type: 3}
+    hitAudioVolume: 0.2
+    missAudioClip: {fileID: 8300000, guid: 09d643ea71ce6c140ab810b69112a588, type: 3}
+    missAudioVolume: 0.2
   answerClip: {fileID: 8300000, guid: 95e9d2c07dd6c5f4696ea9b3a46cf37d, type: 3}

@@ -18,16 +18,22 @@ MonoBehaviour:
   callClip: {fileID: 8300000, guid: cebb22b1b4253fa408a2a295efdd3fea, type: 3}
   callClipVolume: 0.2
   answerInfo:
-  - numerator: 1
+  - editorColor: {r: 0, g: 0, b: 0, a: 0}
+    numerator: 2
     denominator: 2
-    editorColor: {r: 0, g: 0, b: 0, a: 0}
     beatType: 0
-    audioClip: {fileID: 8300000, guid: 51bc87ee497720641b7ae95a90a31d75, type: 3}
-    audioVolume: 0.2
-  - numerator: 3
+    inputRegion: 0
+    hitAudioClip: {fileID: 8300000, guid: 51bc87ee497720641b7ae95a90a31d75, type: 3}
+    hitAudioVolume: 0.2
+    missAudioClip: {fileID: 8300000, guid: 755f9c112fe25514a8a3d2542dcc5ecd, type: 3}
+    missAudioVolume: 0.2
+  - editorColor: {r: 0, g: 0, b: 0, a: 0}
+    numerator: 3
     denominator: 2
-    editorColor: {r: 0, g: 0, b: 0, a: 0}
     beatType: 0
-    audioClip: {fileID: 8300000, guid: 95e9d2c07dd6c5f4696ea9b3a46cf37d, type: 3}
-    audioVolume: 0.2
+    inputRegion: 0
+    hitAudioClip: {fileID: 8300000, guid: 95e9d2c07dd6c5f4696ea9b3a46cf37d, type: 3}
+    hitAudioVolume: 0.2
+    missAudioClip: {fileID: 8300000, guid: 7985ff95fd59c0e4789b69e323d99309, type: 3}
+    missAudioVolume: 0.2
   answerClip: {fileID: 8300000, guid: 95e9d2c07dd6c5f4696ea9b3a46cf37d, type: 3}

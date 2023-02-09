@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
+// Chamadas de som da Cue vem com a tag da Call, como por exemplo: "MyCall"
+// Chamadas de som do Hit vem com a tag, mais a posição na lista, como: "MyCall0", "MyCall1", etc.
+// Chamadas de som de Miss vem com a tag do hit, mais o texto "Miss", como: "MyCall0Miss", MyCall1Miss", etc.
 public class CallSoundController : MonoBehaviour
 {
     public AudioMixerGroup audioMixerGroup;
@@ -50,6 +53,8 @@ public class CallSoundController : MonoBehaviour
         CallData callData = callDatas.Find( (data) => data.tag == tag );
         if (callData == null)
             return;
+
+        Debug.Log("Play " + tag);
 
         callData.PlayAudio();
     }

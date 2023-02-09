@@ -43,6 +43,9 @@ namespace RhythmSystem
         Conductor conductor; 
         BeatMapData beatMapData;
 
+        public static string HitNoteTagFormat (BeatCall beatCall, int i) => beatCall.tag + i;
+        public static string MissSufix => "Miss";
+
         // This class should be always set-up by the BeatMapCaller.
         public void Setup (Conductor conductor, BeatMapData beatMapData)
         {
@@ -80,7 +83,10 @@ namespace RhythmSystem
                 for (int j = 0; j < beatCall.answerInfo.Count; j++)
                 {
                     BeatAnswerInformation answerInfo = beatCall.answerInfo[j];
-                    callSoundController.AddCallData(beatCall.tag + j, answerInfo.audioClip, answerInfo.audioVolume);
+                    callSoundController
+                        .AddCallData( tag: HitNoteTagFormat(beatCall, j), answerInfo.hitAudioClip, answerInfo.hitAudioVolume );
+                    callSoundController
+                        .AddCallData( tag: HitNoteTagFormat(beatCall, j) + MissSufix, answerInfo.missAudioClip, answerInfo.missAudioVolume );
                 }
             }
         }
@@ -121,9 +127,9 @@ namespace RhythmSystem
 
                     // TO-DO: fazer esse tempo não depender de cueData.time para evitar proliferação de erros de arredondamento
                     double time = cueData.time + (answerInfo.Fraction() * conductor.secPerBeat);
-                    beatmapHits.Add( new NoteData(beatCall.tag + i, time) );
+                    beatmapHits.Add( new NoteData( HitNoteTagFormat(beatCall, i), time) );
 
-                    Debug.Log("time: " + time);
+                    //Debug.Log("time: " + time);
                 }
             }
 
@@ -202,6 +208,14 @@ namespace RhythmSystem
             if (activeHitNotes == null || activeHitNotes.Count < 1)
                 return null;
             return activeHitNotes[0];
+        }
+
+        public void PlayNoteSound(string noteTag)
+        {
+            if (!callSoundController)
+                return;
+
+            callSoundController.PlayCallSound(noteTag);
         }
     }
 }

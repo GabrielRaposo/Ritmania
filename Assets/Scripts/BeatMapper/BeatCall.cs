@@ -53,14 +53,19 @@ public enum BeatType {Normal, Dependent, HoldStart, HoldEnd}
 [System.Serializable]
 public class BeatAnswerInformation
 {
+    public Color editorColor;
+
     public int numerator;
     public int denominator;
 
-    public Color editorColor;
     public BeatType beatType;
     public InputRegion inputRegion;
-    public AudioClip audioClip;
-    [Range(0f, 1.0f)] public float audioVolume = 1.0f;
+
+    public AudioClip hitAudioClip;
+    [Range(0f, 1.0f)] public float hitAudioVolume = .2f;
+
+    public AudioClip missAudioClip;
+    [Range(0f, 1.0f)] public float missAudioVolume = .2f;
 
     public BeatAnswerInformation()
     {

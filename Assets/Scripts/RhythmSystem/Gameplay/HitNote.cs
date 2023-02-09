@@ -105,11 +105,13 @@ namespace RhythmSystem
             {
                 default:
                 case PrecisionScore.Perfect:
-                    SFXController.Instance.PlaySound("Hit");
+                    //SFXController.Instance.PlaySound("Hit");
+                    beatTrack.PlayNoteSound(noteTag);
                     break;
 
                 case PrecisionScore.Miss:
-                    SFXController.Instance.PlaySound("Error");
+                    //SFXController.Instance.PlaySound("Error");
+                    beatTrack.PlayNoteSound(noteTag + BeatTrack.MissSufix);
                     break;
             }
 
