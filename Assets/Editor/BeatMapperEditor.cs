@@ -31,10 +31,13 @@ public class BeatMapperEditor : Editor
     private int previousBpm;
     
     private float previousTime;
+
     private int beatTempo;
     private int beatCompass;
 
     private BeatTiming currentBeatCall;
+
+    private int newBpm;
 
     public override bool RequiresConstantRepaint() => true;
 
@@ -113,7 +116,7 @@ public class BeatMapperEditor : Editor
                 nextC = 0;
             }
             
-            BeatTiming beat = obj.timedCalls.Find(a => a.compass == nextC && a.tempo == nextT);
+            BeatTiming beat = obj.timedCalls.Find(a => a.tempo.compass == nextC && a.tempo.tempo == nextT);
 
             if (beat != null)
             {
@@ -165,27 +168,12 @@ public class BeatMapperEditor : Editor
         currentBeatCall = obj.timedCalls.Find(
             (BeatTiming a) =>
             {
-                return a.compass == beatCompass && a.tempo == beatTempo;
+                return a.tempo.compass == beatCompass && a.tempo.tempo == beatTempo;
             });
         
         BeatCallsEditor(obj);
         
         GUILayout.Space(5);
-        
-        //PLAY Controller
-        GUILayout.BeginHorizontal(GUILayout.MaxWidth(55));//A
-        if (GUILayout.Button(Resources.Load<Texture2D>("Editor/play")))
-            mainAudio.Play();
-
-        if (GUILayout.Button(Resources.Load<Texture2D>("Editor/pause")))
-            mainAudio.Pause();
-
-        if (GUILayout.Button(Resources.Load<Texture2D>("Editor/stop")))
-        {
-            mainAudio.Pause();
-            mainAudio.time = 0;
-        }
-        GUILayout.EndHorizontal(); //A0
 
         //Time line
         int timelineH = 65;
@@ -204,6 +192,24 @@ public class BeatMapperEditor : Editor
 
         var scrollSpaceRect = GUILayoutUtility.GetLastRect();
         
+        
+        GUILayout.BeginHorizontal(); //C
+        //PLAY Controller
+        GUILayout.BeginHorizontal(GUILayout.MaxWidth(55));//A
+        if (GUILayout.Button(Resources.Load<Texture2D>("Editor/play")))
+            mainAudio.Play();
+
+        if (GUILayout.Button(Resources.Load<Texture2D>("Editor/pause")))
+            mainAudio.Pause();
+
+        if (GUILayout.Button(Resources.Load<Texture2D>("Editor/stop")))
+        {
+            mainAudio.Pause();
+            mainAudio.time = 0;
+        }
+
+        GUILayout.EndHorizontal(); //A0
+        
         //Scroll timeline mark
 
         var scrollBarRect = new Rect(scrollSpaceRect.x + 13, scrollSpaceRect.y + scrollSpaceRect.height - 12
@@ -217,6 +223,21 @@ public class BeatMapperEditor : Editor
         GUI.DrawTexture(pointRect, Resources.Load<Texture2D>("Editor/reddot"));
 
         GUILayout.Label($"({beatTempo}/{beatCompass}) {time.ToTimeDisplay()}");
+
+        GUILayout.Space(20);
+
+        newBpm = EditorGUILayout.IntField(newBpm, GUILayout.Width(30));
+        if (GUILayout.Button("BPM", GUILayout.Width(50)))
+        {
+            if (obj.bpmChanges == null)
+                obj.bpmChanges = new List<Tuple<Tempo, int>>();
+            
+            obj.bpmChanges.Add(new Tuple<Tempo, int>(new Tempo(beatTempo, beatCompass), newBpm));
+        }
+        
+        GUILayout.FlexibleSpace();
+        
+        GUILayout.EndHorizontal(); //0C
         
         //Calls Buttons
         if (!mainAudio.isPlaying)
@@ -504,7 +525,7 @@ public class BeatMapperEditor : Editor
             
             int beatLenghtInPixels = Mathf.RoundToInt((obj.BeatLenght * 0.25f / mainAudio.clip.length) * lenght);
             
-            int x = Mathf.RoundToInt(((c.tempo+c.compass*0.25f) * obj.BeatLenght / mainAudio.clip.length)*lenght) - 4;
+            int x = Mathf.RoundToInt(((c.tempo.tempo+c.tempo.compass*0.25f) * obj.BeatLenght / mainAudio.clip.length)*lenght) - 4;
             
             combinedArrowsTexture.OverlayTexture(x, halfHeight, arrow0);
 
@@ -517,7 +538,7 @@ public class BeatMapperEditor : Editor
                 //int responseX = x + beatLenghtInPixels * call.answersSpacing * i + beatLenghtInPixels*call.answerDistance;
                 int responseX = Mathf.RoundToInt
                 (
-                    (c.tempo + (c.compass + call.answerDistance + (call.answersSpacing * i)) * 0.25f) * obj.BeatLenght /
+                    (c.tempo.tempo + (c.tempo.compass + call.answerDistance + (call.answersSpacing * i)) * 0.25f) * obj.BeatLenght /
                     mainAudio.clip.length * lenght
                 ) - 4;
                 combinedArrowsTexture.OverlayTexture(responseX,0,downArrow0);

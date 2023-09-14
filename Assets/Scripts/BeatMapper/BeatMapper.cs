@@ -8,12 +8,10 @@ using UnityEngine.Serialization;
 public class BeatMapper : ScriptableObject
 {
     public AudioClip clip;
-    public int bpm;
-
-    public float BeatLenght => 60f / bpm;
-
     public List<BeatCall> callTypes;
     public List<BeatTiming> timedCalls;
+
+    public List<Tuple<Tempo, int>> bpmChanges;
 
     public void RemoveCall(string code)
     {
@@ -28,26 +26,71 @@ public class BeatMapper : ScriptableObject
         if(toRemove!= null)
             callTypes.Remove(toRemove);
     }
+    
+    public int GetBpm(int index)
+    {
+        if (bpmChanges == null)
+            return -1;
+        if (bpmChanges.Count <= index)
+            return -1;
+
+        return bpmChanges[index].Item2;
+    }
+
+    public float GetBeatLenght(int index)
+    {
+        if (bpmChanges == null)
+            return -1;
+        if (bpmChanges.Count <= index)
+            return -1;
+
+        return 60f / GetBpm(index);
+    }
 
     public BeatCall GetCallFromCode(string code)
     {
         return callTypes.Find(a => a.Code == code);
     }
+
+    public float GetTimeFromTempo(Tempo t)
+    {
+        if (bpmChanges == null)
+            return -1;
+
+        if (bpmChanges.Count == 0)
+            return -1;
+
+        if (bpmChanges.Count == 1)
+            return t.compass * GetBeatLenght(0) + t.tempo * 4 * GetBeatLenght(0);
+
+        if (t < bpmChanges[1].Item1)
+            return t.compass * GetBeatLenght(0) + t.tempo * 4 * GetBeatLenght(0);
+        
+        float time = 0f;
+
+        int index = 0;
+        
+        while (t<bpmChanges[index].Item1 && bpmChanges.Count < index)
+        {
+            index++;
+        }
+        
+        
+
+    }
     
 }
 
-[System.Serializable]
+[Serializable]
 public class BeatTiming
 {
-    public int tempo;
-    public int compass;
-
+    public Tempo tempo;
+    
     public string code;
 
     public BeatTiming(int t, int c, string code)
     {
-        tempo = t;
-        compass = c;
+        tempo = new Tempo(t, c);
         this.code = code;
     }
 
@@ -61,8 +104,8 @@ public class BeatTiming
         
         for (int i = 0; i < call.answerCount; i++)
         {
-            int t = tempo;
-            int c = compass + call.answerDistance + call.answersSpacing * i;
+            int t = tempo.tempo;
+            int c = tempo.compass + call.answerDistance + call.answersSpacing * i;
                     
             if (c >= 4)
             {
